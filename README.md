@@ -19,8 +19,8 @@ Installation
 ------------
 All services and code will setup on the same machine, Centos7 or Raspberrypi 4.9.59-v7+
 
-&nbsp;&nbsp;Start by installing Raspberrypi, download 'RASPBIAN STRETCH LITE' from https://www.raspberrypi.org/downloads/raspbian/
-&nbsp;&nbsp;&nbsp;And create micro-sd with that image (Rufus is recomended)
+Start by installing Raspberrypi, download 'RASPBIAN STRETCH LITE' from https://www.raspberrypi.org/downloads/raspbian/
+And create micro-sd with that image (Rufus is recomended)
 Based on: Linux raspberrypi 4.9.59-v7+ # armv7l GNU/Linux
 
 For Setting up the project on Centos7 OS, Download image: https://www.centos.org/download/
@@ -105,8 +105,24 @@ chmod +x $HOME/nalkins.cloud.automation.sh
 ./nalkins.cloud.automation.sh
 ```
 	
-* If you wish to install manually or error uccored (and it probably will! prepare yourself :-),
-Just got to (URL TO nalkins.cloud.automation.sh) And run line by line accourding to your OS.
+* **If you wish to install manually _or error uccored_ (and it probably will! prepare yourself :-),
+Just got to (URL TO nalkins.cloud.automation.sh) And run line by line accourding to your OS.**
+
+Post Installation
+-----------------
+
+Go to 
+	https://www.nalkins.cloud/admin/oauth2_provider/application/add/ *Please change domain with relevant IP\Domain*
+```
+Choose:
+	Client type: Confidential
+	Authorization grant type: Resource owner password-based
+	Name: Android (To your choice)
+	
+	And save
+```
+Whe have just created an application so django can serve clients  
+Please 
 
 Conclusion
 ----------
