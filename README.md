@@ -72,7 +72,7 @@ interface eth0
 ```
 
 `sudo reboot`
-Now SSH to the respberry with 192.168.0.10, Then you could leave you pi near the router
+Now SSH to the respberry with 192.168.0.10, Then you could leave your pi near the router
 
 secure the connection:
 ```
@@ -101,7 +101,7 @@ sudo ufw enable
 ```
 
 ### Before you begin
-If you use registered domain name and not dynamic IP address, I strongly recommend using lets encrypt certificated instead of self-signed,
+If you use registered domain name and not dynamic IP address, I strongly recommend using lets encrypt certificates instead of self-signed,
 If you do not have registered domain, I recommend using DDNS services as [no-ip](https://www.noip.com/remote-access), 
 This will allow you to use your own domain name pointing to your local WAN address,
 by installing an agent on the server (or even your router), the agent will constantly sync your dynamic ip address,
@@ -117,14 +117,15 @@ If using Raspbian: `sudo apt-get -y install git`
 Clone setup automation
 ```
 cd $HOME
-git clone https://github.com/ArieLevs/NalkinsCloud.git
+git clone #### CLONE NALKINS.CLOUD SETUP AUTOMATION
 ```
 
 #### Important:
 Before you run the file, make sure to `vim $HOME/nalkins.cloud.conf` properly *nalkins.cloud.conf* file, Please choose passwords
 	
 For **__Automatic Project Installation__** on a single node, run nalkins.cloud.automation.sh
-* You will be prompt few times during installation so please pay attention, Please note installation will take some time when installing on Raspberry Pi. 
+* You will be prompt few times during installation so please pay attention, 
+Please note installation will take some time when installing on Raspberry Pi. 
 ```
 chmod +x $HOME/nalkins.cloud.automation.sh
 ./nalkins.cloud.automation.sh
@@ -132,10 +133,11 @@ chmod +x $HOME/nalkins.cloud.automation.sh
 
 	
 * **If you wish to install manually _or error uccored_ (and it probably will! prepare yourself and feel free to raise questions :-),
-Just got to (URL TO nalkins.cloud.automation.sh) And run line by line according to your OS. Installation guide is inside this file as comments**
+Just got to https://github.com/ArieLevs/NalkinsCloud/blob/master/nalkins.cloud.automation.sh And run line by line according to your OS. 
+Installation guide is inside this file as comments**
 
 ### Very Important:
-Once installation finish succeesfully, save all passwords from *nalkins.cloud.conf* file, 
+Once installation finished succeesfully, save all passwords from *nalkins.cloud.conf* file, 
 I recommend using password managment application like [KeePass](https://keepass.info/), Then you MUST PERMANENTLY remove this file.
 
 Post Installation
@@ -159,8 +161,6 @@ Please walkthrough [NalkinsCloud-ESP8266](https://github.com/ArieLevs/NalkinsClo
 
 ### Android Application
 Please walkthrough [NalkinsCloud-Android](https://github.com/ArieLevs/NalkinsCloud-Android)
-
-### Setting up Homebridge
 
 Conclusion
 ----------
