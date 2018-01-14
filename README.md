@@ -117,7 +117,7 @@ If using Raspbian: `sudo apt-get -y install git`
 Clone setup automation
 ```
 cd $HOME
-git clone #### CLONE NALKINS.CLOUD SETUP AUTOMATION
+git clone git clone https://github.com/ArieLevs/NalkinsCloud.git
 ```
 
 #### Important:
