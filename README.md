@@ -124,11 +124,7 @@ git clone https://github.com/ArieLevs/NalkinsCloud.git
 Before you run the file, you can update `vim $HOME/NalkinsCloud/group_vars/all`
 If vars are not updated, defaults will be installed
 ```
-chmod +x $HOME/nalkins.cloud.automation.sh
-./nalkins.cloud.automation.sh
-
 ansible-playbook -i inventory -Kb -u [USERNAME] -e"mosquitto_host=[MOSQUITTO_HOST_GROUP] database_hosts=[DB_HOST_GROUP] django_host=[DJANGO_HOST_GROUP] domain_name=[DOMAIN_NAME] graylog_host=[GRAYLOG_HOST] certificates_path=[PATH_TO_CERTIFICATES]" $HOME/NalkinsCloud/nalkinscloud_deploy.yml --key-file "[SSH_KEY]"
-
 ```
 
 ### Very Important:
