@@ -1,0 +1,33 @@
+---
+
+- name: Certs Generator | Install PIP Python2
+  yum:
+    name: python-pip
+    state: latest
+
+- name: Certs Generator | Install PIP pyOpenSSL module
+  pip:
+    name: pyOpenSSL
+    state: latest
+
+- name: Certs Generator | Ensure keys directory exists
+  file:
+    path: /etc/ssl/keys
+    state: directory
+
+- name: Certs Generator | Generate an OpenSSL private key.
+  openssl_privatekey:
+    path: /etc/ssl/keys/{{ domain_name }}.key
+
+- name: Certs Generator | Generate an OpenSSL CSR.
+  openssl_csr:
+    path: /etc/ssl/certs/{{ domain_name }}.csr
+    privatekey_path: /etc/ssl/keys/{{ domain_name }}.key
+    common_name: "{{ domain_name }}"
+
+- name: Certs Generator | Generate a Self Signed OpenSSL certificate.
+  openssl_certificate:
+    path: /etc/ssl/certs/{{ domain_name }}.cer
+    privatekey_path: /etc/ssl/keys/{{ domain_name }}.key
+    csr_path: /etc/ssl/certs/{{ domain_name }}.csr
+    provider: selfsigned

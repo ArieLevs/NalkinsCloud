@@ -1,0 +1,41 @@
+---
+
+- name: MariaDB | Sets the root password
+  mysql_user:
+    login_user: root
+    login_password: ""
+    user: root
+    password: "{{ database_root_password | default(default_database_root_pass) }}"
+    host: localhost
+
+- name: MariaDB | Deletes anonymous user for all hosts
+  mysql_user:
+    login_user: root
+    login_password: "{{ database_root_password | default(default_database_root_password) }}"
+    user: ''
+    host_all: yes
+    state: "absent"
+
+- name: MariaDB | Secures the MySQL root user for all hosts
+  mysql_user:
+    login_user: root
+    login_password: "{{ database_root_password | default(default_database_root_password) }}"
+    user: root
+    password: "{{ database_root_password | default(default_database_root_pass) }}"
+    host_all: yes
+
+- name: MariaDB | Removes the MySQL test database
+  mysql_db:
+    login_user: root
+    login_password: "{{ database_root_password | default(default_database_root_password) }}"
+    db: test
+    state: absent
+
+- name: MariaDB | Create 'flag' to indicae above process executed
+  copy:
+    content: ""
+    dest: /tmp/mysql_secure_installation_flag
+    force: no
+    group: root
+    owner: root
+    mode: 0644

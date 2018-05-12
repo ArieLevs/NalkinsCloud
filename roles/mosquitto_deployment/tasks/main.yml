@@ -1,0 +1,122 @@
+---
+
+- name: Mosquitto | Add mosquitto user
+  user:
+    name: mosquitto
+
+- name: Mosquitto | Install Mosquitto dependencies
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - gcc
+    - gcc-c++
+    - openssl-devel
+    - libuuid
+    - libuuid-devel
+    - mysql-devel
+
+- name: Mosquitto | Check if Mosquitto already downloaded
+  stat:
+    path: /tmp/mosquitto-1.4.14.tar.gz
+  register: mosquitto_found
+
+- name: Mosquitto | Download Mosquitto
+  get_url:
+    url: http://mosquitto.org/files/source/mosquitto-1.4.14.tar.gz
+    dest: /tmp/mosquitto-1.4.14.tar.gz
+    mode: 0644
+    owner: root
+    group: root
+  when: mosquitto_found.stat.exists == False
+
+- name: Mosquitto | Extract Mosquitto
+  shell: tar xvzf /tmp/mosquitto-1.4.14.tar.gz -C /tmp
+  args:
+    warn: false
+
+- name: Mosquitto | Set mosquitto config build file
+  replace:
+    dest:  /tmp/mosquitto-1.4.14/config.mk
+    regexp: "^WITH_SRV:=yes"
+    replace: "WITH_SRV:=no"
+
+- name: Mosquitto | Build Mosquitto project
+  make:
+    chdir: /tmp/mosquitto-1.4.14/
+
+- name: Mosquitto | Install Mosquitto project
+  make:
+    chdir: /tmp/mosquitto-1.4.14/
+    target: install
+
+- name: Mosquitto | Installing Python3.6 repo
+  yum:
+    name: https://centos7.iuscommunity.org/ius-release.rpm
+
+- name: Mosquitto | Installing Python3.6
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - python36u
+    - python36u-pip
+    - python36u-devel
+
+- name: Mosquitto | Installing PIP related dependencies
+  pip:
+    name: "{{ item }}"
+    executable: pip3.6
+  with_items:
+    - paho-mqtt
+    - mysqlclient
+
+- name: Mosquitto | Set ld.so.conf file
+  template:
+    src: ld.so.conf.j2
+    dest: /etc/ld.so.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Mosquitto | Create symlink to libmosquitto.so.1 file
+  file:
+    src: /usr/local/lib/libmosquitto.so.1
+    dest: /usr/lib/libmosquitto.so.1
+    owner: root
+    group: root
+    state: link
+
+- name: Mosquitto | Set mosquitto.conf file
+  template:
+    src: mosquitto.conf.j2
+    dest: /etc/mosquitto/mosquitto.conf
+    owner: mosquitto
+    group: mosquitto
+    mode: 0644
+
+- name: Mosquitto | Creates logs directory
+  file:
+    path: /var/log/mosquitto
+    state: directory
+    owner: mosquitto
+    group: mosquitto
+    mode: 0766
+
+- include: setup_auth_plug.yml
+
+- include: generate_selfsigned_certificates.yml
+
+- include: set_mosquitto_systemd.yml
+
+- name: Mosquitto | Open Mosquitto TLS Port
+  firewalld:
+    zone: public
+    port: "{{ item.port }}"
+    permanent: "{{ item.permanent }}"
+    state: enabled
+  with_items:
+    - { port: '{{ default_mosquitto_tls_port }}/tcp', permanent: true }
+
+- name: Mosquitto | Reload firewalld
+  shell: firewall-cmd --reload

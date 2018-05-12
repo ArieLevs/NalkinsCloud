@@ -1,0 +1,35 @@
+---
+
+- name: DB Data | Set new test_dht_simulator username
+  replace:
+    dest: "{{ default_django_project_root }}/nalkinscloud_mosquitto/fixtures/mosquitto_initial_data.yaml"
+    regexp: "{{ item.old_val }}"
+    replace: "{{ item.new_val }}"
+  with_items:
+    - { old_val: 'device_id: test_dht_simulator', new_val: 'device_id: {{ mqtt_broker_dht_user }}'}
+    - { old_val: 'device: test_dht_simulator', new_val: 'device: {{ mqtt_broker_dht_user }}'}
+    - { old_val: 'topic: test_dht_simulator/#', new_val: 'topic: {{ mqtt_broker_dht_user }}/#'}
+  when: mqtt_broker_dht_user is defined and mqtt_broker_dht_user != ''
+
+- name: DB Data | Set new test_switch_simulator username
+  replace:
+    dest: "{{ default_django_project_root }}/nalkinscloud_mosquitto/fixtures/mosquitto_initial_data.yaml"
+    regexp: "{{ item.old_val }}"
+    replace: "{{ item.new_val }}"
+  with_items:
+    - { old_val: 'device_id: test_switch_simulator', new_val: 'device_id: {{ mqtt_broker_switch_user }}'}
+    - { old_val: 'device: test_switch_simulator', new_val: 'device: {{ mqtt_broker_switch_user }}'}
+    - { old_val: 'topic: test_switch_simulator/#', new_val: 'topic: {{ mqtt_broker_switch_user }}/#'}
+  when: mqtt_broker_switch_user is defined and mqtt_broker_switch_user != ''
+
+- name: DB Data | Set new test_dht_simulator password
+  replace:
+    dest: "{{ default_django_project_root }}/nalkinscloud_mosquitto/fixtures/mosquitto_initial_data.yaml"
+    regexp: "password: # dht simulator password"
+    replace: "password: {{ hashed_mqtt_simulators_random_pass }} # dht simulator password"
+
+- name: DB Data | Set new test_switch_simulator password
+  replace:
+    dest: "{{ default_django_project_root }}/nalkinscloud_mosquitto/fixtures/mosquitto_initial_data.yaml"
+    regexp: "password: # switch simulator password"
+    replace: "password: {{ hashed_mqtt_simulators_random_pass }} # switch simulator password"

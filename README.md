@@ -110,38 +110,36 @@ so you will have access from public internet.
 ### Project installation
 SSH to the instance
 
-If using Centos7: `sudo yum -y install git`
+If using Centos7: `sudo yum -y install git ansible`
 
-If using Raspbian: `sudo apt-get -y install git`
+If using Raspbian: `sudo apt-get -y install git ansible`
 
 Clone setup automation
 ```
 cd $HOME
-git clone git clone https://github.com/ArieLevs/NalkinsCloud.git
+git clone https://github.com/ArieLevs/NalkinsCloud.git
 ```
 
-#### Important:
-Before you run the file, make sure to `vim $HOME/nalkins.cloud.conf` properly *nalkins.cloud.conf* file, Please choose passwords
-	
-For **__Automatic Project Installation__** on a single node, run nalkins.cloud.automation.sh
-* You will be prompt few times during installation so please pay attention, 
-Please note installation will take some time when installing on Raspberry Pi. 
+#### Note:
+Before you run the file, you can update `vim $HOME/NalkinsCloud/group_vars/all`
+If vars are not updated, defaults will be installed
 ```
 chmod +x $HOME/nalkins.cloud.automation.sh
 ./nalkins.cloud.automation.sh
+
+ansible-playbook -i inventory -Kb -u [USERNAME] -e"mosquitto_host=[MOSQUITTO_HOST_GROUP] database_hosts=[DB_HOST_GROUP] django_host=[DJANGO_HOST_GROUP] domain_name=[DOMAIN_NAME] graylog_host=[GRAYLOG_HOST] certificates_path=[PATH_TO_CERTIFICATES]" $HOME/NalkinsCloud/nalkinscloud_deploy.yml --key-file "[SSH_KEY]"
+
 ```
 
-	
-* **If you wish to install manually _or error uccored_ (and it probably will! prepare yourself and feel free to raise questions :-),
-Just got to https://github.com/ArieLevs/NalkinsCloud/blob/master/nalkins.cloud.automation.sh And run line by line according to your OS. 
-Installation guide is inside this file as comments**
-
 ### Very Important:
-Once installation finished succeesfully, save all passwords from *nalkins.cloud.conf* file, 
-I recommend using password managment application like [KeePass](https://keepass.info/), Then you MUST PERMANENTLY remove this file.
+Once installation finished successfully, save all passwords from *$HOME/NalkinsCloud/group_vars/all* file, 
+I recommend using password management application like [KeePass](https://keepass.info/), Then you PERMANENTLY remove these password.
 
 Post Installation
 -----------------
+
+Ansible will store a .bks file at /tmp/[MOSUITTO_HOST]/  
+This file will later be needed in order for the android app to work
 
 Go to `Application` page in django admin, *Please change domain with relevant IP\Domain*.
 	https://www.nalkins.cloud/admin/oauth2_provider/application/add/ 

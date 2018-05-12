@@ -1,0 +1,33 @@
+
+<VirtualHost *:443>
+    ServerName {{ domain_name }}:443
+    ServerAlias www.{{ domain_name }}
+    DocumentRoot {{ default_django_project_root }}/
+
+    SSLEngine on
+    SSLCertificateFile /etc/ssl/certs/{{ domain_name }}.cer
+    {% if certificates_path is defined and certificates_path != "" %}
+    {% if fullchain_exists.stat.exists %}
+    SSLCertificateChainFile /etc/ssl/certs/{{ domain_name }}.fullchain.cer
+    {% endif %}
+    {% endif %}
+    SSLCertificateKeyFile /etc/ssl/keys/{{ domain_name }}.key
+
+    Alias /static {{ default_django_project_root }}/static
+    <Directory {{ default_django_project_root }}/static>
+        Require all granted
+    </Directory>
+
+    <Directory {{ default_django_project_root }}/django_server>
+        <Files wsgi.py>
+            Require all granted
+        </Files>
+    </Directory>
+
+    WSGIDaemonProcess {{ domain_name }} python-path={{ default_django_project_root }}
+    WSGIProcessGroup {{ domain_name }}
+    WSGIScriptAlias / {{ default_django_project_root }}/django_server/wsgi.py
+
+    # Line below is a must for DJANGO OAUTH TOOLKIT to provide tokens
+    WSGIPassAuthorization On
+</VirtualHost>

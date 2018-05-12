@@ -1,0 +1,21 @@
+
+apache_user: apache
+apache_group: apache
+
+default_django_admin_username: admin@nalkins.cloud
+default_django_admin_password: nalkinscloud
+
+default_django_database_name: django
+default_django_database_username: django
+default_django_database_password: nalkinscloud
+default_django_database_host: "{{ hostvars[groups['nalkinscloud_database'][0]].inventory_hostname }}"
+default_django_database_port: 3306
+
+default_django_project_root: "/var/www/html/{{ domain_name }}"
+default_django_temp_directory: "/tmp/{{ domain_name }}"
+
+default_django_git_repo: https://github.com/ArieLevs/NalkinsCloud-Django.git
+default_project_dependencies: [git, policycoreutils-python, python36u-pip, mariadb-devel, gcc]
+
+mqtt_simulators_random_pass: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters') }}"
+hashed_mqtt_simulators_random_pass: '' # Var will be set with new value during runtime

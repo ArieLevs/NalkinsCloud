@@ -1,0 +1,121 @@
+---
+
+- fail:
+    msg: "Nalkinscloud Variable '{{ item }}' is not defined"
+  when: item not in hostvars[inventory_hostname]
+  with_items:
+   - domain_name
+
+   - django_email_host
+   - django_email_host_user
+   - django_email_host_password
+   - django_email_host_port
+
+- name: Main | Installing Python3.6 repo
+  yum:
+    name: https://centos7.iuscommunity.org/ius-release.rpm
+
+- name: Main | Installing Python3.6
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - python36u
+    - python36u-devel
+    - python36u-mod_wsgi.x86_64
+
+- name: Main | Install Project dependencies
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - git
+    - policycoreutils-python
+    - python36u-pip
+    - mariadb-devel
+    - gcc
+
+- name: Main | Installing PIP related dependencies
+  pip:
+    name: "{{ item }}"
+    executable: pip3.6
+  with_items:
+    - django
+    - djangorestframework
+    - django-oauth-toolkit
+    - mysqlclient
+    - django-ipware
+    - apscheduler
+    - PyYAML
+
+- include: use_local_certificates.yml
+  when: certificates_path is defined and certificates_path != ""
+
+- include: generate_selfsigned_certificates.yml
+  when: certificates_path is not defined or certificates_path == ""
+
+- name: Main | Set Virutal host HTTP file
+  template:
+    src: django_http_configs.j2
+    dest: "/etc/httpd/sites-available/{{ domain_name }}.conf"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: 0644
+
+- name: Main | Create symlink to HTTP conf file
+  file:
+    src: "/etc/httpd/sites-available/{{ domain_name }}.conf"
+    dest: "/etc/httpd/sites-enabled/{{ domain_name }}.conf"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    state: link
+
+- name: Main | Set Virutal host HTTPS file
+  template:
+    src: django_https_configs.j2
+    dest: "/etc/httpd/sites-available/{{ domain_name }}.ssl.conf"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: 0644
+
+- name: Main | Create symlink to HTTPS conf file
+  file:
+    src: "/etc/httpd/sites-available/{{ domain_name }}.ssl.conf"
+    dest: "/etc/httpd/sites-enabled/{{ domain_name }}.ssl.conf"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    state: link
+
+- include: setup_django_project.yml
+
+- name: Main | Allow Apache peform network connections
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+
+- name: Main | Allow Apache preform read certificate files
+  seboolean:
+    name: httpd_read_user_content
+    state: yes
+    persistent: yes
+
+- name: Main | Set Project root ownership
+  file:
+    path: /var/www/html
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    state: directory
+    mode: 0744
+    recurse: yes
+  notify:
+    - Restart Apache
+
+#- name: Allow apache to read areas that are a part of the application, outside of the DocumentRoot
+#  sefcontext:
+#    target: '/var/www/html/django_server'
+#    setype: httpd_sys_content_t
+#    state: present
+#
+#- name: Apply above policy
+#  raw: restorecon -Rv /var/www/html/django_server

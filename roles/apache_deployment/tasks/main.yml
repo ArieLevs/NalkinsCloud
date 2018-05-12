@@ -1,0 +1,95 @@
+
+- fail:
+    msg: "Apache_deployment Variable '{{ item }}' is not defined"
+  when: item not in hostvars[inventory_hostname]
+  with_items:
+   - domain_name
+   - graylog_host
+
+- name: Apache Base | Install Apache
+  yum:
+    name: httpd-devel
+    state: latest
+
+- name: Apache Base | Install Apache SSL And Graylog dependencies Support
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - mod_ssl
+    - zlib
+    - nmap-ncat
+    - json-c
+
+- name: Apache Base | Check if Apache mod_gelf already downloaded
+  stat:
+    path: /tmp/libapache2-mod-gelf-0.2.0-1.x86_64.rpm
+  register: mod_gelf_rpm_found
+
+- name: Apache Base | Download Graylog GELF module
+  get_url:
+    url: https://github.com/graylog-labs/apache-mod_log_gelf/releases/download/0.2.0/libapache2-mod-gelf-0.2.0-1.x86_64.rpm
+    dest: /tmp
+    mode: 0440
+    owner: root
+    group: root
+  when: mod_gelf_rpm_found.stat.exists == False
+
+- name: Apache Base | Install Graylog GELF module
+  yum:
+     name: /tmp/libapache2-mod-gelf-0.2.0-1.x86_64.rpm
+     state: present
+
+- name: Apache Base | Add sites-enable to support virtual hosts
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    line: "{{ item.line }}"
+  with_items:
+    - { line: 'IncludeOptional sites-enabled/*.conf' }
+
+- name: Apache Base | Setup ssl configs
+  template:
+    src: "ssl.conf.j2"
+    dest: "/etc/httpd/conf.d/ssl.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Apache Base | Creates sites-enables / sites-available directories
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+  with_items:
+    - { path: '/etc/httpd/sites-enabled'}
+    - { path: '/etc/httpd/sites-available'}
+
+- name: Apache Base | Creates ssl/keys directory
+  file:
+    path: /etc/ssl/keys
+    state: directory
+    owner: root
+    group: root
+    mode: 700
+
+- name: Apache Base | Issue daemon-reload, restart Apache and enable it
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: httpd.service
+    enabled: yes
+
+- name: Apache Base | Open HTTP/S Ports
+  firewalld:
+    zone: public
+    port: "{{ item.port }}"
+    permanent: "{{ item.permanent }}"
+    state: enabled
+  with_items:
+    - { port: '80/tcp', permanent: true }
+    - { port: '443/tcp', permanent: true }
+
+- name: Apache Base | Reload firewalld
+  shell: firewall-cmd --reload

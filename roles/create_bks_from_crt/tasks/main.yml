@@ -1,0 +1,30 @@
+---
+
+- name: BKS | Install Mosquitto dependencies
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - java-1.8.0-openjdk-devel
+
+- name: BKS | Check if bouncycastle .jar already downloaded
+  stat:
+    path: /tmp/bcprov-jdk15on-158.jar
+  register: bks_jar_found
+
+- name: BKS | Download Mosquitto
+  get_url:
+    url: https://www.bouncycastle.org/download/bcprov-jdk15on-158.jar
+    dest: /tmp/bcprov-jdk15on-158.jar
+    mode: 0744
+    owner: root
+    group: root
+  when: bks_jar_found.stat.exists == False
+
+- name: BKS | Create BKS file
+  shell: keytool -importcert -noprompt -v -trustcacerts -file '{{ default_mosquitto_certificates_path }}mosquitto_server.crt' -alias IntermediateCA -keystore '/tmp/mosquitto.{{ domain_name }}.crt.bks' -provider org.bouncycastle.jce.provider.BouncyCastleProvider -providerpath '/tmp/bcprov-jdk15on-158.jar' -storetype BKS -storepass "{{ default_bks_file_password }}"
+
+- name: BKS | Copy created BKS file to guest machine
+  fetch:
+    src: "/tmp/mosquitto.{{ domain_name }}.crt.bks"
+    dest: /tmp

@@ -1,0 +1,31 @@
+---
+
+- name: Certs Local | Copy certificate file
+  copy:
+    src: "{{ certificates_path }}/{{ domain_name }}.cer"
+    dest: "/etc/ssl/certs/{{ domain_name }}.cer"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Certs Local | Check if fullchain certificate exists
+  become: false
+  local_action: "stat path={{ certificates_path }}/fullchain.cer"
+  register: fullchain_exists
+
+- name: Certs Local | Copy fullchain certificate
+  copy:
+    src: "{{ certificates_path }}/fullchain.cer"
+    dest: "/etc/ssl/certs/{{ domain_name }}.fullchain.cer"
+    owner: root
+    group: root
+    mode: 0644
+  when: fullchain_exists.stat.exists
+
+- name: Certs Local | Copy certificate private key file
+  copy:
+    src: "{{ certificates_path }}/{{ domain_name }}.key"
+    dest: "/etc/ssl/keys/{{ domain_name }}.key"
+    owner: root
+    group: root
+    mode: 0644

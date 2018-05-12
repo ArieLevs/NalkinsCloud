@@ -1,0 +1,42 @@
+
+allow_anonymous false
+
+connection_messages true
+log_timestamp true
+log_type all
+log_dest file /var/log/mosquitto/mosquitto.log
+
+listener 1883 localhost
+listener {{ default_mosquitto_tls_port }}
+
+cafile /etc/mosquitto/certs/mosquitto_ca.crt
+keyfile /etc/mosquitto/certs/mosquitto_server.key
+certfile /etc/mosquitto/certs/mosquitto_server.crt
+
+tls_version tlsv1.1
+#use_identity_as_username true
+
+max_inflight_messages 1
+
+### Auth plug parameters - MYSQL back end ####
+auth_plugin /etc/mosquitto/auth-plug.so
+
+auth_opt_backends mysql
+#auth_opt_redis_host
+#auth_opt_redis_port
+auth_opt_host {{ default_mosquitto_database_host }}
+auth_opt_port {{ mosquitto_database_port | default(default_mosquitto_database_port) }}
+auth_opt_dbname {{ mosquitto_database_name | default(default_mosquitto_database_name) }}
+auth_opt_user {{ mosquitto_database_username | default(default_mosquitto_database_username) }}
+auth_opt_pass {{ mosquitto_database_password | default(default_mosquitto_database_password) }}
+auth_opt_userquery SELECT password FROM devices WHERE device_id = '%s'
+auth_opt_superquery SELECT COUNT(*) FROM devices WHERE device_id = '%s' AND super = 1
+auth_opt_aclquery SELECT topic FROM access_list WHERE (device_id = '%s') AND (rw >= '%d')
+auth_opt_anonusername AnonymouS
+
+auth_opt_mysql_opt_reconnect true
+auth_opt_mysql_auto_reconnect true
+#### END Auth plug parameters ####
+
+#Allow multiple connections for same client
+use_username_as_clientid true

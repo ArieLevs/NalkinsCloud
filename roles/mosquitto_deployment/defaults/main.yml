@@ -1,0 +1,9 @@
+
+default_mosquitto_database_name: django
+default_mosquitto_database_username: mosquitto
+default_mosquitto_database_password: nalkinscloud
+default_mosquitto_database_host: "{{ hostvars[groups['nalkinscloud_database'][0]].inventory_hostname }}"
+default_mosquitto_database_port: 3306
+
+default_mosquitto_certificates_path: /etc/ssl/certs/
+default_mosquitto_tls_port: 8883

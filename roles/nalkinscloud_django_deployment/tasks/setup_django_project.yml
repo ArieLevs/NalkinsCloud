@@ -1,0 +1,82 @@
+# Below Django commands are executed via shell and not Django module
+# Since the project uses python 3.6 while Ansible set to 2.7
+---
+
+- name: Django Config | Create Django project dir
+  file:
+    path: "{{ default_django_project_root }}"
+    state: directory
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: 0744
+
+- name: Django Config | Check if project already exists
+  stat:
+    path: "{{ default_django_project_root }}/manage.py"
+  check_mode: no
+  register: project_exists
+
+- name: Django Config | Start Django project
+  shell: django-admin startproject django_server "{{ default_django_project_root }}"/
+  when: project_exists.stat.exists == False
+
+- name: Django Config | Clone Nalkinscloud Django Repo
+  git:
+    repo: "{{ default_django_git_repo }}"
+    dest: "{{ default_django_temp_directory }}"
+    clone: yes
+    update: yes
+    force: yes
+
+- name: Django Config | Copy Nalkinscloud Django files
+  shell: "yes| cp -r {{ default_django_temp_directory }}/* {{ default_django_project_root }}"
+
+- name: Django Config | Set urls.py
+  template:
+    src: urls.py.j2
+    dest: "{{ default_django_project_root }}/django_server/urls.py"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: 0744
+
+- name: Django Config | Set settings.py
+  template:
+    src: settings.py.j2
+    dest: "{{ default_django_project_root }}/django_server/settings.py"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: 0744
+
+- name: Django Config | Set new random secret key for Django server
+  replace:
+    dest: "{{ default_django_project_root }}/django_server/settings.py"
+    regexp: "^SECRET_KEY =.*"
+    replace: "SECRET_KEY = '{{ lookup('password', '/dev/null length=50') }}'"
+
+- name: Django Config | Django makemigrations
+  shell: "python3.6 {{ default_django_project_root }}/manage.py makemigrations"
+
+- name: Django Config | Django migrate
+  shell: "python3.6 {{ default_django_project_root }}/manage.py migrate"
+
+- name: Django Config | Hash mqtt_simulators_random_pass
+  shell: echo -e "from django.contrib.auth.hashers import make_password\nprint(make_password('{{ mqtt_simulators_random_pass }}', salt=None, hasher='pbkdf2_sha256'))" | python3.6 "{{ default_django_project_root }}/manage.py" shell
+  register: returned_hash_password
+
+# TODO Integrate 'mqtt_simulators_random_pass' into django service later once its developed
+
+- name: Django Config | Set new fact for hashed_mqtt_simulators_random_pass
+  set_fact:
+    hashed_mqtt_simulators_random_pass: "{{ returned_hash_password.stdout }}"
+
+- include: prepare_fixtures_data.yml
+
+- name: Django Config | Django fixtures
+  shell: "python3.6 {{ default_django_project_root }}/manage.py loaddata {{ default_django_project_root }}/nalkinscloud_mosquitto/fixtures/mosquitto_initial_data.yaml"
+
+- name: Django Config | Create Django superuser
+  shell: echo "from nalkinscloud.models import User; User.objects.create_superuser('{{ django_admin_username | default('default_django_admin_username') }}', '{{ django_admin_password | default('default_django_admin_password') }}')" | python3.6 "{{ default_django_project_root }}"/manage.py shell
+  ignore_errors: yes # Ignore errors, exception fired if user already exists
+
+- name: Django Config | Django collectstatic
+  shell: "python3.6 {{ default_django_project_root }}/manage.py collectstatic --noinput"

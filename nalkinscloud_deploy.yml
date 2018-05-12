@@ -1,0 +1,29 @@
+# Usage:
+# ansible-playbook -i inventory -Kb -u [USERNAME] -e"mosquitto_host=[MOSQUITTO_HOST_GROUP] database_hosts=[DB_HOST_GROUP] django_host=[DJANGO_HOST_GROUP] domain_name=[DOMAIN_NAME] graylog_host=[GRAYLOG_HOST] certificates_path=[PATH_TO_CERTIFICATES]" nalkinscloud_deploy.yml --key-file "[SSH_KEY]"
+
+- name: Nalkinscloud MariaDB Installation
+  hosts: "{{ database_hosts }}"
+  become: true
+  roles:
+    - mariadb_deployment
+    - mariadb_nalkinscloud_db_set
+
+- name: Nalkinscloud Mosquitto Installation
+  hosts: "{{ mosquitto_hosts }}"
+  become: true
+  roles:
+    - mosquitto_deployment
+    - create_bks_from_crt
+
+- name: NalkinsCloud Installation
+  hosts: "{{ django_hosts }}"
+  become: true
+  roles:
+    - apache_deployment
+    - nalkinscloud_django_deployment
+
+#- name: Nalkinscloud Device Simulators
+#  hosts: "{{ mqtt_simulators_hosts }}"
+#  become: true
+#  roles:
+#    - nalkinscloud_mqtt_simulators

@@ -1,0 +1,22 @@
+
+default_database_name: nalkinscloud
+default_database_root_password: ''
+
+default_django_database_name: nalkinscloud
+default_django_database_username: django
+default_django_database_password: nalkinscloud
+default_django_database_host: "{{ hostvars[groups['nalkinscloud_django'][0]].inventory_hostname }}"
+default_django_database_port: 3306
+
+default_mqtt2db_database_name: nalkinscloud
+default_mqtt2db_database_username: mqtt2db
+default_mqtt2db_database_password: nalkinscloud
+default_mqtt2db_database_host: "{{ hostvars[groups['nalkinscloud_mosquitto'][0]].inventory_hostname }}"
+default_mqtt2db_database_port: 3306
+
+default_mosquitto_database_name: nalkinscloud
+default_mosquitto_database_username: mosquitto
+default_mosquitto_database_password: nalkinscloud
+default_mosquitto_database_host: "{{ hostvars[groups['nalkinscloud_mosquitto'][0]].inventory_hostname }}"
+default_mosquitto_database_port: 3306
+

@@ -1,0 +1,7 @@
+
+<VirtualHost *:80>
+    ServerName {{ domain_name }}
+    ServerAlias www.{{ domain_name }}
+
+    Redirect permanent / https://{{ domain_name }}/
+</VirtualHost>

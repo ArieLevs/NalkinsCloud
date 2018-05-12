@@ -1,0 +1,3 @@
+
+default_bks_file_password: nalkinscloud
+default_mosquitto_certificates_path: /etc/ssl/certs/

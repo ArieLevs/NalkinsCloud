@@ -1,0 +1,52 @@
+---
+
+- name: Auth Plug | Installing GIT
+  yum:
+    name: git
+    state: latest
+
+- name: Auth Plug | Clone Mosquitto Auth Plug  Repo
+  git:
+    repo: https://github.com/jpmens/mosquitto-auth-plug.git
+    dest: /tmp/mosquitto-auth-plug
+    clone: yes
+    update: yes
+    force: yes
+
+- name: Auth Plug | Copy config.mk
+  copy:
+    src: /tmp/mosquitto-auth-plug/config.mk.in
+    dest: /tmp/mosquitto-auth-plug/config.mk
+    owner: root
+    group: root
+    mode: 0644
+    remote_src: yes
+
+- name: Auth Plug | Set config.mk file
+  template:
+    src: auth_plug_config.mk.j2
+    dest: /tmp/mosquitto-auth-plug/config.mk
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Auth Plug | Set cache.c file
+  template:
+    src: auth_plug_cache.c.j2
+    dest: /tmp/mosquitto-auth-plug/cache.c
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Auth Plug | Build Mosquitto-auth-plug project
+  make:
+    chdir: /tmp/mosquitto-auth-plug/
+
+- name: Auth Plug | Copy generated file to mosquito directory
+  copy:
+    src: /tmp/mosquitto-auth-plug/auth-plug.so
+    dest: /etc/mosquitto/auth-plug.so
+    owner: root
+    group: root
+    mode: 0644
+    remote_src: yes
