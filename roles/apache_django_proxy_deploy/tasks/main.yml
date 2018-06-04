@@ -1,52 +1,11 @@
----
 
 - fail:
-    msg: "Nalkinscloud Variable '{{ item }}' is not defined"
+    msg: "Apache_proxy Variable '{{ item }}' is not defined"
   when: item not in hostvars[inventory_hostname]
   with_items:
+   - use_ssl
    - domain_name
-
-   - django_email_host
-   - django_email_host_user
-   - django_email_host_password
-   - django_email_host_port
-
-- name: Main | Installing Python3.6 repo
-  yum:
-    name: https://centos7.iuscommunity.org/ius-release.rpm
-
-- name: Main | Installing Python3.6
-  yum:
-    name: "{{ item }}"
-    state: latest
-  with_items:
-    - python36u
-    - python36u-devel
-    - python36u-mod_wsgi.x86_64
-
-- name: Main | Install Project dependencies
-  yum:
-    name: "{{ item }}"
-    state: latest
-  with_items:
-    - git
-    - policycoreutils-python
-    - python36u-pip
-    - mariadb-devel
-    - gcc
-
-- name: Main | Installing PIP related dependencies
-  pip:
-    name: "{{ item }}"
-    executable: pip3.6
-  with_items:
-    - django
-    - djangorestframework
-    - django-oauth-toolkit
-    - mysqlclient
-    - django-ipware
-    - apscheduler
-    - PyYAML
+   - proxy_port
 
 - include: use_local_certificates.yml
   when: certificates_path is defined and certificates_path != ""
@@ -85,8 +44,6 @@
     owner: "{{ apache_user }}"
     group: "{{ apache_group }}"
     state: link
-
-- include: setup_django_project.yml
 
 - name: Main | Allow Apache peform network connections
   seboolean:

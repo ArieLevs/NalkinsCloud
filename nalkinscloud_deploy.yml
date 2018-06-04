@@ -20,7 +20,8 @@
   become: true
   roles:
     - apache_deployment
-    - nalkinscloud_django_deployment
+    - nalkinscloud_django_build
+    - apache_django_proxy_deploy
 
 #- name: Nalkinscloud Device Simulators
 #  hosts: "{{ mqtt_simulators_hosts }}"

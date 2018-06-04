@@ -1,13 +1,49 @@
+---
+
+- fail:
+    msg: "Ansible Nalkinscloud Django Build Variable '{{ item }}' is not defined"
+  when: item not in hostvars[inventory_hostname]
+  with_items:
+   - domain_name
+
+   - django_email_host
+   - django_email_host_user
+   - django_email_host_password
+   - django_email_host_port
+
+- name: Main | Installing Python3.6 repo
+  yum:
+    name: https://centos7.iuscommunity.org/ius-release.rpm
+
+- name: Main | Installing Python3.6
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - python36u
+    - python36u-devel
+    - python36u-mod_wsgi.x86_64
+
+- name: Main | Install Project dependencies
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - git
+    - policycoreutils-python
+    - python36u-pip
+    - mariadb-devel
+    - gcc
+
 # Below Django commands are executed via shell and not Django module
 # Since the project uses python 3.6 while Ansible set to 2.7
----
 
 - name: Django Config | Create Django project dir
   file:
     path: "{{ default_django_project_root }}"
     state: directory
-    owner: "{{ apache_user }}"
-    group: "{{ apache_group }}"
+    owner: root
+    group: root
     mode: 0744
 
 - name: Django Config | Check if project already exists
@@ -31,20 +67,26 @@
 - name: Django Config | Copy Nalkinscloud Django files
   shell: "yes| cp -r {{ default_django_temp_directory }}/* {{ default_django_project_root }}"
 
+- name: Main | Installing PIP related dependencies
+  pip:
+    requirements: "{{ default_django_temp_directory }}/requirements.txt"
+    virtualenv: "{{ default_django_temp_directory }}/virtualenv"
+    virtualenv_python: python3.6
+
 - name: Django Config | Set urls.py
   template:
     src: urls.py.j2
     dest: "{{ default_django_project_root }}/django_server/urls.py"
-    owner: "{{ apache_user }}"
-    group: "{{ apache_group }}"
+    owner: root
+    group: root
     mode: 0744
 
 - name: Django Config | Set settings.py
   template:
     src: settings.py.j2
     dest: "{{ default_django_project_root }}/django_server/settings.py"
-    owner: "{{ apache_user }}"
-    group: "{{ apache_group }}"
+    owner: root
+    group: root
     mode: 0744
 
 - name: Django Config | Set new random secret key for Django server
