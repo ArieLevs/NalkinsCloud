@@ -47,3 +47,6 @@ ENV/
 
 # mkdocs documentation
 /site
+
+# MacOS
+.DS_Store
