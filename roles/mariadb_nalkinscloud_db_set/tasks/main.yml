@@ -1,9 +1,16 @@
 ---
 
-- name: DB Config | Add Python MySQL support
+- name: MariaDB | Debian | Adds Python MySQL support on Debian/Ubuntu
+  apt:
+    pkg: python-mysqldb
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: MariaDB | RedHat/CentOS | Adds Python MySQL support
   yum:
     name: MySQL-python
     state: present
+  when: ansible_os_family == 'RedHat'
 
 - name: DB Config | Create nalkinscloud database
   mysql_db:
