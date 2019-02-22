@@ -4,72 +4,80 @@
   user:
     name: mosquitto
 
-- name: Mosquitto | Install Mosquitto dependencies
+- name: Mosquitto | RedHat/CentOS | Install Mosquitto dependencies
   yum:
-    name: "{{ item }}"
+    name: ['python36-pip', 'gcc', 'gcc-c++', 'openssl-devel', 'libuuid', 'libuuid-devel', 'mysql-devel']
     state: latest
-  with_items:
-    - gcc
-    - gcc-c++
-    - openssl-devel
-    - libuuid
-    - libuuid-devel
-    - mysql-devel
+  when: ansible_os_family == 'RedHat'
+
+- name: Mosquitto | Debian | Install Mosquitto dependencies
+  apt:
+    pkg: ['gcc', 'g++', 'make', 'libssl-dev', 'uuid', 'uuid-dev', 'libmariadbclient-dev']
+    state: latest
+  when: ansible_os_family == 'Debian'
+
+- name: Mosquitto | Installing Python3.6 repo
+  yum:
+    name: https://centos7.iuscommunity.org/ius-release.rpm
+  when: ansible_os_family == 'RedHat'
+
+- name: Mosquitto | Installing Python3.6
+  yum:
+    name: ['python36u', 'python36u-pip', 'python36u-devel', 'python36-setuptools']
+    state: latest
+  when: ansible_os_family == 'RedHat'
+
+- name: Mosquitto | Debian | Installing Python3
+  apt:
+    pkg: ['python3', 'python3-pip', 'python3-dev', 'python-setuptools']
+    state: latest
+  when: ansible_os_family == 'Debian'
 
 - name: Mosquitto | Check if Mosquitto already downloaded
   stat:
-    path: /tmp/mosquitto-1.4.14.tar.gz
+    path: /tmp/mosquitto-1.5.7.tar.gz
   register: mosquitto_found
 
 - name: Mosquitto | Download Mosquitto
   get_url:
-    url: http://mosquitto.org/files/source/mosquitto-1.4.14.tar.gz
-    dest: /tmp/mosquitto-1.4.14.tar.gz
+    url: http://mosquitto.org/files/source/mosquitto-1.5.7.tar.gz
+    dest: /tmp/mosquitto-1.5.7.tar.gz
     mode: 0644
     owner: root
     group: root
   when: mosquitto_found.stat.exists == False
 
 - name: Mosquitto | Extract Mosquitto
-  shell: tar xvzf /tmp/mosquitto-1.4.14.tar.gz -C /tmp
+  shell: tar xvzf /tmp/mosquitto-1.5.7.tar.gz -C /tmp
   args:
     warn: false
 
 - name: Mosquitto | Set mosquitto config build file
   replace:
-    dest:  /tmp/mosquitto-1.4.14/config.mk
+    dest:  /tmp/mosquitto-1.5.7/config.mk
     regexp: "^WITH_SRV:=yes"
     replace: "WITH_SRV:=no"
 
 - name: Mosquitto | Build Mosquitto project
   make:
-    chdir: /tmp/mosquitto-1.4.14/
+    chdir: /tmp/mosquitto-1.5.7/
 
 - name: Mosquitto | Install Mosquitto project
   make:
     chdir: /tmp/mosquitto-1.4.14/
     target: install
 
-- name: Mosquitto | Installing Python3.6 repo
-  yum:
-    name: https://centos7.iuscommunity.org/ius-release.rpm
-
-- name: Mosquitto | Installing Python3.6
-  yum:
-    name: "{{ item }}"
-    state: latest
-  with_items:
-    - python36u
-    - python36u-pip
-    - python36u-devel
-
-- name: Mosquitto | Installing PIP related dependencies
+- name: Mosquitto | RedHat/CentOS | Installing PIP related dependencies
   pip:
-    name: "{{ item }}"
+    name: ['paho-mqtt', 'mysqlclient']
     executable: pip3.6
-  with_items:
-    - paho-mqtt
-    - mysqlclient
+  when: ansible_os_family == 'RedHat'
+
+- name: Mosquitto | Debian| Installing PIP related dependencies
+  pip:
+    name: ['paho-mqtt', 'mysqlclient']
+    executable: pip3
+  when: ansible_os_family == 'Debian'
 
 - name: Mosquitto | Set ld.so.conf file
   template:
@@ -109,7 +117,7 @@
 
 - include: set_mosquitto_systemd.yml
 
-- name: Mosquitto | Open Mosquitto TLS Port
+- name: SSL | RedHat/CentOS | Open TLS Ports
   firewalld:
     zone: public
     port: "{{ item.port }}"
@@ -117,6 +125,18 @@
     state: enabled
   with_items:
     - { port: '{{ default_mosquitto_tls_port }}/tcp', permanent: true }
+  when: ansible_os_family == 'RedHat'
 
-- name: Mosquitto | Reload firewalld
+- name: SSL | RedHat/CentOS | Reload firewalld
   shell: firewall-cmd --reload
+  when: ansible_os_family == 'RedHat'
+
+- name: SSL | Debian | Open TLS Ports
+  ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: tcp
+    state: "{{ item.state }}"
+  with_items:
+    - { port: '{{ default_mosquitto_tls_port }}', state: enabled }
+  when: ansible_os_family == 'Debian'

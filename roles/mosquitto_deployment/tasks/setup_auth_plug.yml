@@ -1,11 +1,18 @@
 ---
 
-- name: Auth Plug | Installing GIT
+- name: Auth Plug | RedHat/CentOS | Installing GIT
   yum:
     name: git
     state: latest
+  when: ansible_os_family == 'RedHat'
 
-- name: Auth Plug | Clone Mosquitto Auth Plug  Repo
+- name: Auth Plug | Debian | Installing GIT
+  apt:
+    pkg: git
+    state: latest
+  when: ansible_os_family == 'Debian'
+
+- name: Auth Plug | Clone Mosquitto Auth Plug Repo
   git:
     repo: https://github.com/jpmens/mosquitto-auth-plug.git
     dest: /tmp/mosquitto-auth-plug

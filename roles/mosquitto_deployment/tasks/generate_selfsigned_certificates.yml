@@ -27,7 +27,7 @@
   openssl_csr:
     path:  "{{ default_mosquitto_certificates_path }}mosquitto_ca.csr"
     privatekey_path: "{{ default_mosquitto_certificates_path }}mosquitto_ca.key"
-    common_name: "{{ domain_name }}"
+    common_name: "{{ domain_name | default(hostvars[groups['nalkinscloud_mosquitto'][0]].inventory_hostname )}}"
 
 - name: SSL | Generate an OpenSSL certificate for the CA.
   openssl_certificate:
@@ -45,7 +45,7 @@
   openssl_csr:
     path:  "{{ default_mosquitto_certificates_path }}mosquitto_server.csr"
     privatekey_path: "{{ default_mosquitto_certificates_path }}mosquitto_server.key"
-    common_name: "{{ domain_name }}"
+    common_name: "{{ domain_name | default(hostvars[groups['nalkinscloud_mosquitto'][0]].inventory_hostname ) }}"
 
 - name: SSL | Generate certificate
   shell: openssl x509 -req -in {{ default_mosquitto_certificates_path }}mosquitto_server.csr -CA {{ default_mosquitto_certificates_path }}mosquitto_ca.crt -CAkey {{ default_mosquitto_certificates_path }}mosquitto_ca.key -CAcreateserial -out {{ default_mosquitto_certificates_path }}mosquitto_server.crt -days 360
@@ -56,18 +56,6 @@
 #    privatekey_path: "{{ default_mosquitto_certificates_path }}mosquitto.{{ domain_name }}.key"
 #    csr_path: "{{ default_mosquitto_certificates_path }}mosquitto.{{ domain_name }}.csr"
 #    provider: selfsigned
-
-- name: SSL | Open TLS Ports
-  firewalld:
-    zone: public
-    port: "{{ item.port }}"
-    permanent: "{{ item.permanent }}"
-    state: enabled
-  with_items:
-    - { port: '{{ default_mosquitto_tls_port }}/tcp', permanent: true }
-
-- name: SSL | Reload firewalld
-  shell: firewall-cmd --reload
 
 #- name: SSL | Set certificates directiry permissions
 #  file:
