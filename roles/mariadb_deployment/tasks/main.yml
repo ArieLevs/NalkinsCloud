@@ -1,63 +1,8 @@
 
 ---
 
-- name: MariaDB | Adds Python MySQL support on Debian/Ubuntu
-  apt:
-    pkg: python-mysqldb
-    state: present
+- include: set_debian.yml
   when: ansible_os_family == 'Debian'
 
-- name: MariaDB | Adds Python MySQL support on RedHat/CentOS
-  yum:
-    name: MySQL-python
-    state: present
+- include: setup_rhel_centos.yml
   when: ansible_os_family == 'RedHat'
-
-- name: MariaDB | Add official MariaDB repository
-  yum_repository:
-    name: MariaDB
-    description: MariaDB repository
-    baseurl: http://yum.mariadb.org/10.1/centos7-amd64
-    gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
-    gpgcheck: yes
-
-- name: MariaDB | Install MariaDB
-  yum:
-    name: MariaDB-server
-    state: present
-
-- name: MariaDB | Issue daemon-reload, restart MariaDB and enable it
-  systemd:
-    state: restarted
-    daemon_reload: yes
-    name: mariadb.service
-    enabled: yes
-
-- name: "MariaDB | Check server running on port {{ database_port | default(default_database_port) }}"
-  wait_for:
-    host: 127.0.0.1
-    port: "{{ database_port | default(default_database_port) }}"
-    delay: 5
-    connect_timeout: 1
-
-- name: MariaDB | Open MariaDB Port
-  firewalld:
-    zone: public
-    port: "{{ item.port }}"
-    permanent: "{{ item.permanent }}"
-    state: enabled
-  with_items:
-    - { port: '{{ database_port | default(default_database_port) }}/tcp', permanent: true }
-
-- name: MariaDB | Reload firewalld
-  shell: firewall-cmd --reload
-
-- name: MariaDB | Check if Secure Installation already executed
-  stat:
-    path: /tmp/mysql_secure_installation_flag
-  register: mysql_secure_flag_found
-
-- include: mysql_secure_installation.yml
-  when: mysql_secure_flag_found.stat.exists == False
-
-

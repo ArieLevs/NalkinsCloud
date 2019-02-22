@@ -1,0 +1,43 @@
+---
+- name: MariaDB | Debian | Adds Python MySQL support on Debian/Ubuntu
+  apt:
+    pkg: python-mysqldb
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: MariaDB | Debian | Install MariaDB
+  apt:
+    name: mariadb-server
+  when: ansible_os_family == 'Debian'
+
+- name: MariaDB | Debian | Issue daemon-reload, restart MariaDB and enable it
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: mariadb.service
+    enabled: yes
+
+- name: "MariaDB | Debian | Check server running on port {{ database_port | default(default_database_port) }}"
+  wait_for:
+    host: 127.0.0.1
+    port: "{{ database_port | default(default_database_port) }}"
+    delay: 5
+    connect_timeout: 1
+
+- name: MariaDB | Debian | Open MariaDB Port
+  ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: tcp
+    state: "{{ item.state }}"
+  with_items:
+    - { port: '{{ database_port | default(default_database_port) }}', state: enabled }
+  when: ansible_os_family == 'Debian'
+
+- name: MariaDB | Debian | Check if Secure Installation already executed
+  stat:
+    path: /tmp/mysql_secure_installation_flag
+  register: mysql_secure_flag_found
+
+- include: mysql_secure_installation.yml
+  when: mysql_secure_flag_found.stat.exists == False
