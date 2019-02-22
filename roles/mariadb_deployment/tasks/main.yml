@@ -1,7 +1,7 @@
 
 ---
 
-- include: set_debian.yml
+- include: setup_debian.yml
   when: ansible_os_family == 'Debian'
 
 - include: setup_rhel_centos.yml
