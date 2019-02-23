@@ -35,36 +35,36 @@
 
 - name: Mosquitto | Check if Mosquitto already downloaded
   stat:
-    path: /tmp/mosquitto-1.5.7.tar.gz
+    path: "/tmp/mosquitto-{{ mosquitto_version | default(default_mosquitto_version) }}.tar.gz"
   register: mosquitto_found
 
 - name: Mosquitto | Download Mosquitto
   get_url:
-    url: http://mosquitto.org/files/source/mosquitto-1.5.7.tar.gz
-    dest: /tmp/mosquitto-1.5.7.tar.gz
+    url: http://mosquitto.org/files/source/mosquitto-{{ mosquitto_version | default(default_mosquitto_version) }}.tar.gz
+    dest: /tmp/mosquitto-{{ mosquitto_version | default(default_mosquitto_version) }}.tar.gz
     mode: 0644
     owner: root
     group: root
   when: mosquitto_found.stat.exists == False
 
 - name: Mosquitto | Extract Mosquitto
-  shell: tar xvzf /tmp/mosquitto-1.5.7.tar.gz -C /tmp
+  shell: tar xvzf /tmp/mosquitto-{{ mosquitto_version | default(default_mosquitto_version) }}.tar.gz -C /tmp
   args:
     warn: false
 
 - name: Mosquitto | Set mosquitto config build file
   replace:
-    dest:  /tmp/mosquitto-1.5.7/config.mk
+    dest:  /tmp/mosquitto-{{ mosquitto_version | default(default_mosquitto_version) }}/config.mk
     regexp: "^WITH_SRV:=yes"
     replace: "WITH_SRV:=no"
 
 - name: Mosquitto | Build Mosquitto project
   make:
-    chdir: /tmp/mosquitto-1.5.7/
+    chdir: /tmp/mosquitto-{{ mosquitto_version | default(default_mosquitto_version) }}/
 
 - name: Mosquitto | Install Mosquitto project
   make:
-    chdir: /tmp/mosquitto-1.4.14/
+    chdir: /tmp/mosquitto-{{ mosquitto_version | default(default_mosquitto_version) }}/
     target: install
 
 - name: Mosquitto | RedHat/CentOS | Installing PIP related dependencies

@@ -1,9 +1,9 @@
 ---
 
-- name: SSL | Install PIP Python2
-  yum:
-    name: python-pip
-    state: latest
+#- name: SSL | Install PIP Python2
+#  yum:
+#    name: python-pip
+#    state: latest
 
 - name: SSL | Install PIP pyOpenSSL module
   pip:
