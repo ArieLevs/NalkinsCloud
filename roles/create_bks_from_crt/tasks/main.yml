@@ -1,18 +1,23 @@
 ---
 
-- name: BKS | Install Mosquitto dependencies
+- name: BKS | Install Jave
   yum:
-    name: "{{ item }}"
+    name: ['java-1.8.0-openjdk-devel']
     state: latest
-  with_items:
-    - java-1.8.0-openjdk-devel
+  when: ansible_os_family == 'RedHat'
+
+- name: BKS | Install Jave
+  apt:
+    pkg: ['openjdk-8-jre']
+    state: latest
+  when: ansible_os_family == 'Debian'
 
 - name: BKS | Check if bouncycastle .jar already downloaded
   stat:
     path: /tmp/bcprov-jdk15on-158.jar
   register: bks_jar_found
 
-- name: BKS | Download Mosquitto
+- name: BKS | Download bouncycastle .jar
   get_url:
     url: https://www.bouncycastle.org/download/bcprov-jdk15on-158.jar
     dest: /tmp/bcprov-jdk15on-158.jar
@@ -21,10 +26,15 @@
     group: root
   when: bks_jar_found.stat.exists == False
 
+- name: BKS | Delete BKS file if exists
+  file:
+    path: /tmp/mosquitto_server.crt.bks
+    state: absent
+
 - name: BKS | Create BKS file
-  shell: keytool -importcert -noprompt -v -trustcacerts -file '{{ default_mosquitto_certificates_path }}mosquitto_server.crt' -alias IntermediateCA -keystore '/tmp/mosquitto.{{ domain_name }}.crt.bks' -provider org.bouncycastle.jce.provider.BouncyCastleProvider -providerpath '/tmp/bcprov-jdk15on-158.jar' -storetype BKS -storepass "{{ default_bks_file_password }}"
+  shell: keytool -importcert -noprompt -v -trustcacerts -file '{{ mosquitto_certificates_crt_path | default(default_mosquitto_certificates_crt_path) }}' -alias IntermediateCA -keystore '/tmp/mosquitto_server.crt.bks' -provider org.bouncycastle.jce.provider.BouncyCastleProvider -providerpath '/tmp/bcprov-jdk15on-158.jar' -storetype BKS -storepass "{{ mosquitto_bks_file_password | default(default_mosquitto_bks_file_password) }}"
 
 - name: BKS | Copy created BKS file to guest machine
   fetch:
-    src: "/tmp/mosquitto.{{ domain_name }}.crt.bks"
+    src: /tmp/mosquitto_server.crt.bks
     dest: /tmp
