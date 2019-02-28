@@ -12,6 +12,19 @@
     state: present
   when: ansible_os_family == 'RedHat'
 
+#- name: MariaDB | Set nalkinscloud.sql.j2 file
+#  template:
+#    src: nalkinscloud.sql.j2
+#    dest: /tmp/nalkinscloud.sql
+#
+#- name: DB Config | Create nalkinscloud database
+#  mysql_db:
+#    login_user: root
+#    login_password: "{{ database_root_password | default(default_database_root_password) }}"
+#    name: "{{ database_name | default(default_database_name) }}"
+#    state: import
+#    target: /tmp/nalkinscloud.sql
+
 - name: DB Config | Create nalkinscloud database
   mysql_db:
     login_user: root
@@ -25,9 +38,12 @@
     login_password: "{{ database_root_password | default(default_database_root_password) }}"
     name: "{{ mosquitto_database_username | default(default_mosquitto_database_username) }}"
     password: "{{ mosquitto_database_password | default(default_mosquitto_database_password) }}"
-    priv: '{{ mosquitto_database_name | default(default_mosquitto_database_name) }}.*:ALL'
-    host: "{{ default_mosquitto_database_host }}"
+    priv: '*.*:ALL'
+    host: "{{ item }}"
     state: present
+  with_items:
+#    - "{{ mosquitto_database_host| default(default_mosquitto_database_host) }}"
+    - "%"
 
 - name: DB Config | Create 'mqtt2db' user
   mysql_user:
@@ -35,9 +51,12 @@
     login_password: "{{ database_root_password | default(default_database_root_password) }}"
     name: "{{ mqtt2db_database_username | default(default_mqtt2db_database_username) }}"
     password: "{{ mqtt2db_database_password | default(default_mqtt2db_database_password) }}"
-    priv: '{{ mqtt2db_database_name | default(default_mqtt2db_database_name) }}.*:ALL'
-    host: "{{ default_mqtt2db_database_host }}"
+    priv: '*.*:ALL'
+    host: "{{ item }}"
     state: present
+  with_items:
+#    - "{{ mqtt2db_database_host| default(default_mqtt2db_database_host) }}"
+    - "%"
 
 - name: DB Config | Create 'django' user
   mysql_user:
@@ -45,6 +64,9 @@
     login_password: "{{ database_root_password | default(default_database_root_password) }}"
     name: "{{ django_database_username | default(default_django_database_username) }}"
     password: "{{ django_database_password | default(default_django_database_password) }}"
-    priv: '{{ django_database_name | default(default_django_database_name) }}.*:ALL'
-    host: "{{ default_django_database_host }}"
+    priv: '*.*:ALL'
+    host: "{{ item }}"
     state: present
+  with_items:
+#    - "{{ django_database_host| default(default_django_database_host) }}"
+    - "%"
