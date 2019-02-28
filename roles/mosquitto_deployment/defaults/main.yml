@@ -9,3 +9,4 @@ default_mosquitto_database_port: 3306
 
 default_mosquitto_certificates_path: /etc/ssl/certs/
 default_mosquitto_tls_port: 8883
+default_mosquitto_port: 1883

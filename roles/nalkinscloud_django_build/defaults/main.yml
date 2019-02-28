@@ -8,7 +8,6 @@ default_django_database_password: nalkinscloud
 default_django_database_host: "{{ hostvars[groups['nalkinscloud_database'][0]].inventory_hostname }}"
 default_django_database_port: 3306
 
-default_django_project_root: "/var/www/html/{{ domain_name }}"
 default_django_temp_directory: "/tmp/{{ domain_name }}"
 
 default_django_git_repo: https://github.com/ArieLevs/NalkinsCloud-Django.git

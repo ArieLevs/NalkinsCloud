@@ -117,7 +117,7 @@
 
 - include: set_mosquitto_systemd.yml
 
-- name: SSL | RedHat/CentOS | Open TLS Ports
+- name: Mosquitto | RedHat/CentOS | Open TLS Ports
   firewalld:
     zone: public
     port: "{{ item.port }}"
@@ -125,13 +125,14 @@
     state: enabled
   with_items:
     - { port: '{{ default_mosquitto_tls_port }}/tcp', permanent: true }
+    - { port: '{{ default_mosquitto_port }}/tcp', permanent: true }
   when: ansible_os_family == 'RedHat'
 
-- name: SSL | RedHat/CentOS | Reload firewalld
+- name: Mosquitto | RedHat/CentOS | Reload firewalld
   shell: firewall-cmd --reload
   when: ansible_os_family == 'RedHat'
 
-- name: SSL | Debian | Open TLS Ports
+- name: Mosquitto | Debian | Open TLS Ports
   ufw:
     rule: allow
     port: "{{ item.port }}"
@@ -139,4 +140,5 @@
     state: "{{ item.state }}"
   with_items:
     - { port: '{{ default_mosquitto_tls_port }}', state: enabled }
+    - { port: '{{ default_mosquitto_port }}', state: enabled }
   when: ansible_os_family == 'Debian'
