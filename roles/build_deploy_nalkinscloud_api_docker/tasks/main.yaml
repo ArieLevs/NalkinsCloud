@@ -1,0 +1,86 @@
+---
+
+- fail:
+    msg: "Ansible Nalkinscloud Django Build Variable '{{ item }}' is not defined"
+  when: item not in hostvars[inventory_hostname]
+  with_items:
+   - domain_name
+   - django_email_host
+   - django_email_host_user
+   - django_email_host_password
+   - django_email_host_port
+
+- include_role:
+    name: install_docker
+
+- name: Docker nalkinscloud API | Git clone nalkinscloud api
+# Example read-write git checkout from github
+  git:
+    repo: "{{ nalkinscloud_api_git_repo | default(default_nalkinscloud_api_git_repo) }}"
+    dest: /tmp/nalkinscloud-api
+
+- name: Docker nalkinscloud API | RedHat/CentOS | Install pip
+  yum:
+    name: ['python-pip']
+    state: latest
+  become: true
+  when: ansible_os_family == 'RedHat'
+
+- name: Docker nalkinscloud API | Debian | Install pip
+  apt:
+    pkg: ['python-pip']
+    state: latest
+  when: ansible_os_family == 'Debian'
+
+- name: Docker nalkinscloud API | Install PIP docker module
+  pip:
+    name: ['setuptools', 'docker-py']
+    state: latest
+
+- name: Docker nalkinscloud API | Build Docker image from Dockerfile
+  docker_image:
+    name: nalkinscloud-api
+    path: /tmp/nalkinscloud-api
+    state: build
+
+- name: Docker nalkinscloud API | Run nalkinscloud-api container
+  docker_container:
+    name: 'nalkinscloud-api'
+    image: 'nalkinscloud-api'
+    state: 'started'
+    env:
+      environment: "{{ api_environment | default(default_api_environment) }}"
+      allowed_hosts: "{{ hostvars[groups['nalkinscloud_django'][0]].inventory_hostname }}"
+
+      django_secret_key: "{{ lookup('password', '/dev/null length=50') }}'"
+      db_name: "{{ django_database_name | default(default_django_database_name) }}"
+      db_user: "{{ django_database_username | default(default_django_database_username) }}"
+      db_pass: "{{ django_database_password | default(default_django_database_password) }}"
+      db_host: "{{ django_database_host | default(default_django_database_host) }}"
+      db_port: "{{ django_database_port | default(default_django_database_port) }}"
+
+      version: "{{ version | default(default_django_version) }}"
+      backend_domain: "{{ hostvars[groups['nalkinscloud_django'][0]].inventory_hostname }}"
+      frontend_domain: "{{ hostvars[groups['nalkinscloud_django'][0]].inventory_hostname }}"
+
+      email_username: "{{ email_username | default(default_email_username) }}"
+      email_password: "{{ email_password | default(default_email_password) }}"
+      email_host: "{{ email_host | default(default_email_host) }}"
+      email_port: "{{ email_port | default(default_email_port) }}"
+
+      static_url: "{{ static_url | default(default_static_url) }}"
+    ports:
+      - "8000:8000"
+    restart_policy: always
+  register: nalkinscloud_api_container
+
+- name: Docker nalkinscloud API | Wait for api to accept connections
+  wait_for:
+    host: '{{ nalkinscloud_api_container["ansible_facts"]["docker_container"]["NetworkSettings"]["IPAddress"] }}'
+    port: 8000
+    state: drained
+    connect_timeout: 1
+    timeout: 30
+  register: django_running
+  until: django_running is success
+  retries: 10

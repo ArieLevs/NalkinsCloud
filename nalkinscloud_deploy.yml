@@ -1,30 +1,37 @@
 # Usage:
 # ansible-playbook -i inventory -Kb -u [USERNAME] -e"mosquitto_host=[MOSQUITTO_HOST_GROUP] database_hosts=[DB_HOST_GROUP] django_host=[DJANGO_HOST_GROUP] domain_name=[DOMAIN_NAME] graylog_host=[GRAYLOG_HOST] certificates_path=[PATH_TO_CERTIFICATES]" nalkinscloud_deploy.yml --key-file "[SSH_KEY]"
 
+- name: System Init
+  hosts:
+    - "{{ database_host }}"
+    - "{{ mosquitto_host }}"
+    - "{{ django_host }}"
+  become: true
+  roles:
+    - system_init
+
 - name: Nalkinscloud MariaDB Installation
-  hosts: "{{ database_hosts }}"
+  hosts: "{{ database_host }}"
   become: true
   roles:
     - mariadb_deployment
-    - mariadb_nalkinscloud_db_set
+    - mariadb_set_database
 
 - name: Nalkinscloud Mosquitto Installation
-  hosts: "{{ mosquitto_hosts }}"
+  hosts: "{{ mosquitto_host }}"
   become: true
   roles:
-    - mosquitto_deployment
+    - build_deploy_mosquitto_docker
     - create_bks_from_crt
 
 - name: NalkinsCloud Installation
-  hosts: "{{ django_hosts }}"
+  hosts: "{{ django_host }}"
   become: true
   roles:
-    - apache_deployment
-    - nalkinscloud_django_build
-    - apache_django_proxy_deploy
+    - build_deploy_nalkinscloud_api_docker
 
-#- name: Nalkinscloud Device Simulators
-#  hosts: "{{ mqtt_simulators_hosts }}"
-#  become: true
-#  roles:
-#    - nalkinscloud_mqtt_simulators
+- name: Nalkinscloud Device Simulators
+  hosts: "{{ mqtt_simulators_host }}"
+  become: true
+  roles:
+    - build_deploy_mqtt_simulators

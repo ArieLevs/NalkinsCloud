@@ -1,0 +1,9 @@
+
+default_mosquitto_git_repo: https://github.com/ArieLevs/docker-mosquitto-auth-plug.git
+default_mosquitto_tls_port: 8883
+
+default_mosquitto_database_host: 127.0.0.1
+default_mosquitto_database_port: 3306
+default_mosquitto_database_name: nalkinscloud
+default_mosquitto_database_username: mosquitto
+default_mosquitto_database_password: nalkinscloud

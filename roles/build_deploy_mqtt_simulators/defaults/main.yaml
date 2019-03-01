@@ -1,0 +1,15 @@
+
+default_mqtt_simulators_git_repo: https://github.com/ArieLevs/NalkinsCloud-MQTT-Automation-Simulators.git
+default_broker_host: "{{ hostvars[groups['nalkinscloud_mosquitto'][0]].inventory_hostname }}"
+default_broker_port: 1883
+default_dht_user: test_dht_simulator
+default_dht_pass: nalkinscloud
+default_dht_topic: test_dht_simulator
+default_dht_qos: 1
+default_switch_user: test_switch_simulator
+default_switch_pass: nalkinscloud
+default_switch_topic: test_switch_simulator
+default_switch_qos: 1
+default_graylog_enabled: False
+default_graylog_host: localhost
+default_graylog_port: 12201

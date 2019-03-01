@@ -1,0 +1,78 @@
+---
+
+- fail:
+    msg: "Ansible Nalkinscloud Mosquitto Build Variable '{{ item }}' is not defined"
+  when: item not in hostvars[inventory_hostname]
+  with_items:
+   - domain_name
+
+- name: Docker mosquitto | call role generate certificate
+  include_role:
+    name: generate_selfsigned_certificates
+  vars:
+    cert_name: 'mosquitto'
+    common_name: "{{ domain_name | default(hostvars[groups['nalkinscloud_mosquitto'][0]].inventory_hostname )}}"
+
+- name: Docker mosquitto | Call role install docker
+  include_role:
+    name: install_docker
+
+- name: Docker mosquitto | Git clone mosquitto docker
+  git:
+    repo: "{{ mosquitto_git_repo | default(default_mosquitto_git_repo) }}"
+    dest: /tmp/mosquitto
+
+- name: Docker mosquitto | RedHat/CentOS | Install pip
+  yum:
+    name: ['python-pip']
+    state: latest
+  become: true
+  when: ansible_os_family == 'RedHat'
+
+- name: Docker mosquitto | Debian | Install pip
+  apt:
+    pkg: ['python-pip']
+    state: latest
+  when: ansible_os_family == 'Debian'
+
+- name: Docker nalkinscloud API | Install PIP docker module
+  pip:
+    name: ['setuptools', 'docker-py']
+    state: latest
+
+- name: Docker mosquitto | Build Docker image from Dockerfile
+  docker_image:
+    name: mosquitto
+    path: /tmp/mosquitto
+    state: build
+
+- name: Docker Mosquitto | Set mosquitto.conf file
+  template:
+    src: mosquitto.conf.j2
+    dest: ~/mosquitto.conf
+
+- name: Docker mosquitto | Run mosquitto container
+  docker_container:
+    name: 'mosquitto'
+    image: 'mosquitto'
+    state: 'started'
+    env:
+      environment: 'production'
+    ports:
+      - "{{ default_mosquitto_tls_port }}:{{ default_mosquitto_tls_port }}"
+      - "1883:1883"
+    volumes:
+      - ~/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    restart_policy: always
+  register: mosquitto_container
+
+- name: Docker mosquitto | Wait for mosquitto to accept connections
+  wait_for:
+    host: '{{ mosquitto_container["ansible_facts"]["docker_container"]["NetworkSettings"]["IPAddress"] }}'
+    port: 1883
+    state: drained
+    connect_timeout: 1
+    timeout: 30
+  register: mosquitto_running
+  until: mosquitto_running is success
+  retries: 10

@@ -1,0 +1,60 @@
+---
+
+#- fail:
+#    msg: "Ansible Nalkinscloud MQTT Simulators Build Variable '{{ item }}' is not defined"
+#  when: item not in hostvars[inventory_hostname]
+#  with_items:
+#   - domain_name
+
+- name: Docker MQTT simulators | Git clone nalkinscloud api
+# Example read-write git checkout from github
+  git:
+    repo: "{{ mqtt_simulators_git_repo | default(default_mqtt_simulators_git_repo) }}"
+    dest: /tmp/mqtt_simulators
+
+- name: Docker MQTT simulators | RedHat/CentOS | Install pip
+  yum:
+    name: ['python-pip']
+    state: latest
+  become: true
+  when: ansible_os_family == 'RedHat'
+
+- name: Docker MQTT simulators | Debian | Install pip
+  apt:
+    pkg: ['python-pip']
+    state: latest
+  when: ansible_os_family == 'Debian'
+
+- name: Docker MQTT simulators | Install PIP docker module
+  pip:
+    name: ['setuptools', 'docker-py']
+    state: latest
+
+- name: Docker MQTT simulators | Build Docker image from Dockerfile
+  docker_image:
+    name: mqtt_simulators
+    path: /tmp/mqtt_simulators
+    state: build
+
+- name: Docker MQTT simulators | Run mqtt_simulators container
+  docker_container:
+    name: 'mqtt_simulators'
+    image: 'mqtt_simulators'
+    state: 'started'
+    env:
+      environment: 'production'
+      broker_host: "{{ broker_host | default(default_broker_host) }}"
+      broker_port: "{{ broker_port | default(default_broker_port) }}"
+      dht_user: "{{ dht_user | default(default_dht_user) }}"
+      dht_pass: "{{ dht_pass | default(default_dht_pass) }}"
+      dht_topic: "{{ dht_topic | default(default_dht_topic) }}"
+      dht_qos: "{{ dht_qos | default(default_dht_qos) }}"
+      switch_user: "{{ switch_user | default(default_switch_user) }}"
+      switch_pass: "{{ switch_pass | default(default_switch_pass) }}"
+      switch_topic: "{{ switch_topic | default(default_switch_topic) }}"
+      switch_qos: "{{ switch_qos | default(default_switch_qos) }}"
+      graylog_enabled: "{{ graylog_enabled | default(default_graylog_enabled) }}"
+      graylog_host: "{{ graylog_host | default(default_graylog_host) }}"
+      graylog_port: "{{ graylog_port | default(default_graylog_port) }}"
+    restart_policy: always
+  register: mqtt_simulators_container
