@@ -42,6 +42,7 @@ mosquitto_database_password: nalkinscloud
 mosquitto_database_host: localhost
 mosquitto_database_port: 3306
 mosquitto_bks_file_password: nalkinscloud
+mosquitto_certificates_bks_path: /etc/ssl/certs/mosquitto_server.bks
 
 ############ Simulators ############
 mqtt_broker_host: ''
@@ -52,3 +53,5 @@ mqtt_broker_dht_pass: ''
 mqtt_broker_switch_user: ''
 mqtt_broker_switch_pass: ''
 ####################################
+
+

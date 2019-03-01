@@ -1,7 +1,10 @@
 NalkinsCloud
 ============
-This is an IOT Automation project, it will provide the ability to monitor and control your indoor\outdoor devices from anywhere.
-Project uses server side written in python, hardware written in C++ based on the ESP8266 chip, android application in Java, and small NodeJS server to support IOS clients.
+This is an IOT Automation project, 
+it will provide the ability to monitor and control your indoor\outdoor devices from anywhere.
+Project uses server side written in python, 
+hardware written in C++ based on the ESP8266 chip, 
+android application in Java, and small NodeJS server to support IOS clients.
 
 ![](docs/NalkingCloudDiagram.png)
 
@@ -24,21 +27,21 @@ Installation
 ------------
 All services and code will setup on the same machine, Centos7 or Raspberry Pi 4.9.59-v7+
 
-Start by installing Raspberry pi, download 'RASPBIAN STRETCH LITE' from https://www.raspberrypi.org/downloads/raspbian/
+Start by installing Raspberry pi, download [RASPBIAN STRETCH LITE](https://www.raspberrypi.org/downloads/raspbian/)
 And create micro-sd with that image (Rufus is recommended).  
 Based on: Linux raspberrypi 4.9.59-v7+ # armv7l GNU/Linux
 
-For Setting up the project on Centos7 OS, Download image: https://www.centos.org/download/
-If you need assistance to make the USB installation use this guide https://wiki.centos.org/HowTos/InstallFromUSBkey  
+For setting up the project on Centos7 OS [Download iso image](https://www.centos.org/download/),
+If you need assistance to make the USB installation [use this guide](https://wiki.centos.org/HowTos/InstallFromUSBkey).  
 Based on: CentOS Linux 7 Kernel: Linux 3.10.0-693.5.2.el7.x86_64
 
 - For additional assistance please search on how to install the OS
 
-### If you choose Raspberry Pi you will need to configure it for SSH use
+#### If you choose Raspberry Pi you will need to configure it for SSH use
 Connect the Raspberry Pi to a monitor and keyboard, once OS is up:
 
-Default login user is 'pi' and password is 'raspberry', Change the password  
-After login with 'pi' user type `passwd`  
+Default login user is `pi` and password is `raspberry`, Change the password:  
+Type `passwd`  
 Add user to sudoers and start ssh service
 ```
 sudo usermod -aG sudo pi
@@ -46,13 +49,11 @@ sudo systemctl enable ssh
 sudo systemctl start ssh
 ```
 
-If you wish to use Wi-Fi connection please [Connect Raspberry using Wi-Fi](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md)
-Else connect Raspberry via LAN cable to one of your router ports.
+If you wish to use Wi-Fi connection please [Connect Raspberry using Wi-Fi](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md),  
+Else connect Raspberry via LAN cable to one of your router ports.  
  
-
-*optional: install VIM editor (Internet connection needed)
-`sudo apt-get install vim`
-Allow mouse right click to past clipboard to terminal on vim editor
+* optional: install VIM editor (Internet connection needed) `sudo apt-get install vim`  
+  Allow mouse right click to past clipboard to terminal on vim editor
 ```
 sudo vim /usr/share/vim/vim80/defaults.vim
 #Append: (Comment each line with ")
@@ -70,16 +71,14 @@ interface eth0
 	static routers=192.168.0.1
 	static domain_name_servers=192.168.0.1
 ```
-
-`sudo reboot`
-Now SSH to the respberry with 192.168.0.10, Then you could leave your pi near the router
+Then `sudo reboot`  
+Now SSH to the Respberry with 192.168.0.10, Then you could leave your pi near the router
 
 secure the connection:
 ```
 cd $HOME
 ssh-keygen
 ```
-optional: Change file names and choose password, for no changes just hit enter
 OK so now we have two files: id_rsa and id_rsa.pub at `$HOME/.ssh` directory
 	
 The id_rsa (private key) should be moved to the client (To each machine you will be connecting the Raspberry from, AND KEPT SECURE)
@@ -88,7 +87,7 @@ cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys #add the key
 chmod 600 $HOME/.ssh/authorized_keys
 ```
 Disable password connection `sudo vim /etc/ssh/sshd_config`  
-Change to 'no': `ChallengeResponseAuthentification no` and `PasswordAuthentification no`, save the file  
+Change `ChallengeResponseAuthentification no` to `PasswordAuthentification no` and save the file.  
 Finally run `sudo service ssh reload`
 
 * If using [putty](http://www.putty.org/) to ssh, open puttygen and convert the private key (id_rsa) to .ppk file (import key then save as private key)
@@ -101,49 +100,44 @@ sudo ufw enable
 ```
 
 ### Before you begin
-If you use registered domain name and not dynamic IP address, I strongly recommend using lets encrypt certificates instead of self-signed,
+If you use registered domain name and not dynamic IP address, I strongly recommend using Letsencrypt certificates instead of self-signed,
 If you do not have registered domain, I recommend using DDNS services as [no-ip](https://www.noip.com/remote-access), 
 This will allow you to use your own domain name pointing to your local WAN address,
 by installing an agent on the server (or even your router), the agent will constantly sync your dynamic ip address,
 so you will have access from public internet.
 
 ### Project installation
-SSH to the instance
-
-If using Centos7: `sudo yum -y install git ansible`
-
-If using Raspbian: `sudo apt-get -y install git ansible`
-
-Clone setup automation
+First [install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) on your machine.  
+Clone repository:
 ```
-cd $HOME
 git clone https://github.com/ArieLevs/NalkinsCloud.git
 ```
 
-#### Note:
-Before you run the file, you can update `vim $HOME/NalkinsCloud/group_vars/all`
-If vars are not updated, defaults will be installed
+* You can update `vim NalkinsCloud/group_vars/all`, if vars are not updated, defaults will be installed.
+* Update `inventory` file, with relevant address of the destination installation,
+  So if the host was set to `192.168.0.10` as shown before, set this value.
 ```
 ansible-playbook -i inventory \
     -Kb -u [USERNAME] \
     -e"mosquitto_host=[MOSQUITTO_HOST_GROUP] \
-    database_hosts=[DB_HOST_GROUP] \
-    django_host=[DJANGO_HOST_GROUP] \
-    domain_name=[DOMAIN_NAME] \
-    graylog_host=[GRAYLOG_HOST] \
-    certificates_path=[PATH_TO_CERTIFICATES]" \
-    $HOME/NalkinsCloud/nalkinscloud_deploy.yml \
+    database_host=[DB_HOST_GROUP] \
+    django_hoss=[DJANGO_HOST_GROUP] \
+    mqtt_simulators_host=[SIMULATORS_HOST_GROUP] \
+    domain_name=[DOMAIN_NAME] 
+    django_database_host[DB_HOST] \
+    mosquitto_database_host=[DB_HOST]" \
+    NalkinsCloud/nalkinscloud_deploy.yml \
     --key-file "[SSH_KEY]"
 ```
 
-### Very Important:
-Once installation finished successfully, save all passwords from *$HOME/NalkinsCloud/group_vars/all* file, 
-I recommend using password management application like [KeePass](https://keepass.info/), Then you PERMANENTLY remove these password.
+#### Important:
+Once installation finished successfully, save all passwords from **NalkinsCloud/group_vars/all** file, 
+I recommend using password management application like [KeePass](https://keepass.info/), 
+Then you PERMANENTLY remove these password.
 
 Post Installation
 -----------------
-
-Ansible will store a .bks file at /tmp/[MOSUITTO_HOST]/  
+Ansible will store a .bks file at `/tmp/[MOSUITTO_HOST]/etc/ssl/certs` on your local machine (by default)  
 This file will later be needed in order for the android app to work
 
 Go to `Application` page in django admin, *Please change domain with relevant IP\Domain*.
@@ -176,4 +170,3 @@ Installed Homebridge server with mqtt plugin to support IOS homekit app
 And created a service that will inject mqtt messaged to the database  
 
 * Please note - I'm currently integrating homebridge to NalkinsCloud project, once all is done will update the project
-

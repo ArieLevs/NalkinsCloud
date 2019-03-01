@@ -14,13 +14,13 @@
 
 - name: BKS | Check if bouncycastle .jar already downloaded
   stat:
-    path: /tmp/bcprov-jdk15on-158.jar
+    path: /home/bcprov-jdk15on-158.jar
   register: bks_jar_found
 
 - name: BKS | Download bouncycastle .jar
   get_url:
     url: https://www.bouncycastle.org/download/bcprov-jdk15on-158.jar
-    dest: /tmp/bcprov-jdk15on-158.jar
+    dest: /home/bcprov-jdk15on-158.jar
     mode: 0744
     owner: root
     group: root
@@ -28,13 +28,13 @@
 
 - name: BKS | Delete BKS file if exists
   file:
-    path: /tmp/mosquitto_server.crt.bks
+    path: "{{ mosquitto_certificates_bks_path | default(default_mosquitto_certificates_bks_path) }}"
     state: absent
 
 - name: BKS | Create BKS file
-  shell: keytool -importcert -noprompt -v -trustcacerts -file '{{ mosquitto_certificates_crt_path | default(default_mosquitto_certificates_crt_path) }}' -alias IntermediateCA -keystore '/tmp/mosquitto_server.crt.bks' -provider org.bouncycastle.jce.provider.BouncyCastleProvider -providerpath '/tmp/bcprov-jdk15on-158.jar' -storetype BKS -storepass "{{ mosquitto_bks_file_password | default(default_mosquitto_bks_file_password) }}"
+  shell: keytool -importcert -noprompt -v -trustcacerts -file '{{ mosquitto_certificates_crt_path | default(default_mosquitto_certificates_crt_path) }}' -alias IntermediateCA -keystore '{{ mosquitto_certificates_bks_path | default(default_mosquitto_certificates_bks_path) }}' -provider org.bouncycastle.jce.provider.BouncyCastleProvider -providerpath '/home/bcprov-jdk15on-158.jar' -storetype BKS -storepass "{{ mosquitto_bks_file_password | default(default_mosquitto_bks_file_password) }}"
 
 - name: BKS | Copy created BKS file to guest machine
   fetch:
-    src: /tmp/mosquitto_server.crt.bks
+    src: "{{ mosquitto_certificates_bks_path | default(default_mosquitto_certificates_bks_path) }}"
     dest: /tmp
