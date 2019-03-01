@@ -1,6 +1,0 @@
-
-- name: NalkinsCloud Installation
-  hosts: "{{ hosts }}"
-  become: true
-  roles:
-    - nalkinscloud_django_build

@@ -1,12 +1,12 @@
 ---
 
-- name: BKS | Install Jave
+- name: BKS |  RedHat/CentOS | Install Java
   yum:
     name: ['java-1.8.0-openjdk-devel']
     state: latest
   when: ansible_os_family == 'RedHat'
 
-- name: BKS | Install Jave
+- name: BKS | Debian | Install Java
   apt:
     pkg: ['openjdk-8-jre']
     state: latest

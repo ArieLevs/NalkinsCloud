@@ -1,0 +1,74 @@
+---
+- fail:
+    msg: "Ansible Nalkinscloud Certificate Creation Variable '{{ item }}' is not defined"
+  when: "{{ item }} is not defined"
+  with_items:
+   - cert_name
+
+- name: SSL | Install PIP pyOpenSSL module
+  pip:
+    name: pyOpenSSL
+    state: latest
+
+- name: SSL | Creates certificates directory
+  file:
+    path: "{{ certificates_path | default(default_certificates_path) }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: SSL | Generate an OpenSSL CA key.
+  openssl_privatekey:
+    path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.key"
+    size: 4096
+
+- name: SSL | Generate an OpenSSL CRT for certificate.
+  openssl_csr:
+    path:  "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.csr"
+    privatekey_path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.key"
+    common_name: "{{ common_name | default(default_common_name) }}"
+
+- name: SSL | Generate an OpenSSL certificate for the CA.
+  openssl_certificate:
+    path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.crt"
+    privatekey_path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.key"
+    csr_path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.csr"
+    provider: selfsigned
+
+- name: SSL | Generate an OpenSSL server key.
+  openssl_privatekey:
+    path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_server.key"
+    size: 4096
+
+- name: SSL | Generate an OpenSSL CSR.
+  openssl_csr:
+    path:  "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_server.csr"
+    privatekey_path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_server.key"
+    common_name: "{{ common_name | default(default_common_name) }}"
+
+- name: SSL | Generate certificate
+  shell: |
+    openssl x509 -req \
+    -in {{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_server.csr \
+    -CA {{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.crt \
+    -CAkey {{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.key \
+    -CAcreateserial \
+    -out {{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_server.crt \
+    -days 360
+
+#- name: SSL | Generate a Self Signed OpenSSL certificate.
+#  openssl_certificate:
+#    path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}.{{ domain_name }}.crt"
+#    privatekey_path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}.{{ domain_name }}.key"
+#    csr_path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}.{{ domain_name }}.csr"
+#    provider: selfsigned
+
+#- name: SSL | Set certificates directiry permissions
+#  file:
+#    path: "{{ certificates_path | default(default_certificates_path) }}"
+#    owner: root
+#    group: root
+#    state: directory
+#    mode: 0700
+#    recurse: yes

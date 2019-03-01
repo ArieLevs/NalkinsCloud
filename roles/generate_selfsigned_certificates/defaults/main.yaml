@@ -1,0 +1,3 @@
+
+default_common_name: localhost
+default_certificates_path: /etc/ssl/certs/
