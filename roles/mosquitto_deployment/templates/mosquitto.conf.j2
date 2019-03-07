@@ -7,13 +7,13 @@ log_type all
 log_dest file /var/log/mosquitto/mosquitto.log
 
 listener 1883
-listener {{ default_mosquitto_tls_port }}
+#listener {{ default_mosquitto_tls_port }}
 
-cafile {{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_ca.crt
-keyfile {{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_server.key
-certfile {{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_server.crt
+#cafile {{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_ca.crt
+#keyfile {{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_server.key
+#certfile {{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_server.crt
 
-tls_version tlsv1.1
+#tls_version tlsv1.1
 #use_identity_as_username true
 
 max_inflight_messages 1
@@ -24,7 +24,7 @@ auth_plugin /etc/mosquitto/auth-plug.so
 auth_opt_backends mysql
 #auth_opt_redis_host
 #auth_opt_redis_port
-auth_opt_host {{ default_mosquitto_database_host }}
+auth_opt_host {{ mosquitto_database_host | default(default_mosquitto_database_host) }}
 auth_opt_port {{ mosquitto_database_port | default(default_mosquitto_database_port) }}
 auth_opt_dbname {{ mosquitto_database_name | default(default_mosquitto_database_name) }}
 auth_opt_user {{ mosquitto_database_username | default(default_mosquitto_database_username) }}

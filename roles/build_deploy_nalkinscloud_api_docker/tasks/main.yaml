@@ -47,6 +47,7 @@
     name: 'nalkinscloud-api'
     image: 'nalkinscloud-api'
     state: 'started'
+    network_mode: host
     env:
       environment: "{{ api_environment | default(default_api_environment) }}"
       allowed_hosts: "{{ hostvars[groups['nalkinscloud_django'][0]].inventory_hostname }}"
@@ -75,7 +76,8 @@
 
 - name: Docker nalkinscloud API | Wait for api to accept connections
   wait_for:
-    host: '{{ nalkinscloud_api_container["ansible_facts"]["docker_container"]["NetworkSettings"]["IPAddress"] }}'
+    #host: '{{ nalkinscloud_api_container["ansible_facts"]["docker_container"]["NetworkSettings"]["IPAddress"] }}'
+    host: "{{ hostvars[groups['nalkinscloud_django'][0]].inventory_hostname }}"
     port: 8000
     state: drained
     connect_timeout: 1

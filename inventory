@@ -1,15 +1,15 @@
 
 ############ Django Core ############
 [nalkinscloud_django]
-10.99.0.61
+192.168.0.10
 
 ############ MQTT Broker ############
 [nalkinscloud_mosquitto]
-10.99.0.61
+192.168.0.10
 
 ############ Database ############
 [nalkinscloud_database]
-10.99.0.61
+192.168.0.10
 
 [nalkinscloud_simulators]
-10.99.0.61
+192.168.0.10

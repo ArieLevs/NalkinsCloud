@@ -11,7 +11,7 @@
       when: ansible_os_family == 'Debian'
     - name: Print version
       debug:
-        msg: "Ansible Version: {{ os_id.stdout }}"
+        msg: "OS is name: {{ os_id.stdout }}"
 
 - name: System Init
   hosts:
@@ -20,14 +20,14 @@
     - "{{ django_host }}"
   become: true
   roles:
-#    - system_init
+    - system_init
 
 - name: Nalkinscloud MariaDB Installation
   hosts: "{{ database_host }}"
   become: true
   roles:
-#    - mariadb_deployment
-#    - mariadb_set_database
+    - mariadb_deployment
+    - mariadb_set_database
 
 - name: Generate certificates
   hosts: "{{ mosquitto_host }}"
@@ -57,7 +57,7 @@
   hosts: "{{ django_host }}"
   become: true
   roles:
-#    - build_deploy_nalkinscloud_api_docker
+    - build_deploy_nalkinscloud_api_docker
 
 - name: Nalkinscloud Device Simulators
   hosts: "{{ mqtt_simulators_host }}"

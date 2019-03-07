@@ -26,7 +26,7 @@ database_root_password: nalkinscloud
 django_database_name: nalkinscloud
 django_database_username: django
 django_database_password: nalkinscloud
-django_database_host: localhost
+django_database_host: 127.0.0.1
 django_database_port: 3306
 ##############################################
 
@@ -39,7 +39,7 @@ mosquitto_version: 1.5.7
 mosquitto_database_name: nalkinscloud
 mosquitto_database_username: mosquitto
 mosquitto_database_password: nalkinscloud
-mosquitto_database_host: localhost
+mosquitto_database_host: 127.0.0.1
 mosquitto_database_port: 3306
 mosquitto_bks_file_password: nalkinscloud
 mosquitto_certificates_bks_path: /etc/mosquitto/certs/mosquitto_server.bks

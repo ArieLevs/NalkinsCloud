@@ -49,6 +49,7 @@
     name: 'mosquitto'
     image: 'mosquitto'
     state: 'started'
+    network_mode: 'host'
     env:
       environment: 'production'
     ports:
@@ -61,7 +62,8 @@
 
 - name: Docker mosquitto | Wait for mosquitto to accept connections
   wait_for:
-    host: '{{ mosquitto_container["ansible_facts"]["docker_container"]["NetworkSettings"]["IPAddress"] }}'
+    #host: '{{ mosquitto_container["ansible_facts"]["docker_container"]["NetworkSettings"]["IPAddress"] }}'
+    host: "{{ hostvars[groups['nalkinscloud_mosquitto'][0]].inventory_hostname }}"
     port: 1883
     state: drained
     connect_timeout: 1
