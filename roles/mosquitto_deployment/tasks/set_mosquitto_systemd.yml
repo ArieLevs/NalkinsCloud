@@ -1,5 +1,4 @@
 ---
-
 - name: Systemd | Set mosquitto.service
   template:
     src: mosquitto.service.j2

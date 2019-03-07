@@ -1,6 +1,18 @@
 # Usage:
 # ansible-playbook -i inventory -Kb -u [USERNAME] -e"mosquitto_host=[MOSQUITTO_HOST_GROUP] database_hosts=[DB_HOST_GROUP] django_host=[DJANGO_HOST_GROUP] domain_name=[DOMAIN_NAME] graylog_host=[GRAYLOG_HOST] certificates_path=[PATH_TO_CERTIFICATES]" nalkinscloud_deploy.yml --key-file "[SSH_KEY]"
 
+
+- name: Register OS id name
+  hosts: "{{ mosquitto_host }}"
+  tasks:
+    - name: register os id
+      shell: . /etc/os-release; echo "$ID"
+      register: os_id
+      when: ansible_os_family == 'Debian'
+    - name: Print version
+      debug:
+        msg: "Ansible Version: {{ os_id.stdout }}"
+
 - name: System Init
   hosts:
     - "{{ database_host }}"
@@ -8,30 +20,53 @@
     - "{{ django_host }}"
   become: true
   roles:
-    - system_init
+#    - system_init
 
 - name: Nalkinscloud MariaDB Installation
   hosts: "{{ database_host }}"
   become: true
   roles:
-    - mariadb_deployment
-    - mariadb_set_database
+#    - mariadb_deployment
+#    - mariadb_set_database
 
+- name: Generate certificates
+  hosts: "{{ mosquitto_host }}"
+  become: true
+  roles:
+    - generate_selfsigned_certificates
+  vars:
+    cert_name: 'mosquitto'
+    common_name: "{{ domain_name | default(hostvars[groups['nalkinscloud_mosquitto'][0]].inventory_hostname )}}"
+
+- name: Nalkinscloud Mosquitto Docker Installation
+  hosts: "{{ mosquitto_host }}"
+  become: true
+  roles:
+    - { role: build_deploy_mosquitto_docker, when: os_id.stdout != 'raspbian'}
+
+# Case installation is on a Raspberry Pi
 - name: Nalkinscloud Mosquitto Installation
   hosts: "{{ mosquitto_host }}"
   become: true
   roles:
-    - build_deploy_mosquitto_docker
-    - create_bks_from_crt
+    - { role: mosquitto_deployment, when: os_id.stdout == 'raspbian' }
+  vars:
+    cert_name: 'mosquitto'
 
-- name: NalkinsCloud Installation
+- name: NalkinsCloud Docker Installation
   hosts: "{{ django_host }}"
   become: true
   roles:
-    - build_deploy_nalkinscloud_api_docker
+#    - build_deploy_nalkinscloud_api_docker
 
 - name: Nalkinscloud Device Simulators
   hosts: "{{ mqtt_simulators_host }}"
   become: true
   roles:
     - build_deploy_mqtt_simulators
+
+- name: Create BKS file for mosquitto certificate
+  hosts: "{{ mosquitto_host }}"
+  become: true
+  roles:
+    - create_bks_from_crt

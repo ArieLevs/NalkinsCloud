@@ -18,16 +18,33 @@
     dest: /etc/yum.repos.d/docker-ce.repo
   when: ansible_os_family == 'RedHat'
 
+- name: Register OS id name
+  shell: . /etc/os-release; echo "$ID"
+  register: os_id
+  when: ansible_os_family == 'Debian'
+
 - name: Docker | Debian | Import docker GPG key
   apt_key:
-    url: https://download.docker.com/linux/debian/gpg
+    url: https://download.docker.com/linux/{{ os_id.stdout }}/gpg
     state: present
   when: ansible_os_family == 'Debian'
 
 - name: Docker | Debian | Update apt docker repo
   apt_repository:
-    repo: 'deb [arch=amd64] https://download.docker.com/linux/debian {{ default_docker_distribution_release }} stable'
+    repo: 'deb [arch=armhf] https://download.docker.com/linux/{{ os_id.stdout }} {{ default_docker_distribution_release }} stable'
     state: present
+  when: ansible_os_family == 'Debian' and os_id.stdout != 'raspbian'
+
+- name: Docker | Debian | Update apt docker repo
+  shell: |
+    echo "deb [arch=armhf] https://download.docker.com/linux/{{ os_id.stdout }} \
+    $(lsb_release -cs) stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list
+  when: ansible_os_family == 'Debian' and os_id.stdout == 'raspbian'
+
+- name: Docker | Debian | Update apt packages
+  apt:
+    update_cache: yes
   when: ansible_os_family == 'Debian'
 
 - name: Docker | RedHat/CentOS | Install Docker

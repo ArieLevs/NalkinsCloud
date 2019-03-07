@@ -6,13 +6,6 @@
   with_items:
    - domain_name
 
-- name: Docker mosquitto | call role generate certificate
-  include_role:
-    name: generate_selfsigned_certificates
-  vars:
-    cert_name: 'mosquitto'
-    common_name: "{{ domain_name | default(hostvars[groups['nalkinscloud_mosquitto'][0]].inventory_hostname )}}"
-
 - name: Docker mosquitto | Call role install docker
   include_role:
     name: install_docker
@@ -43,7 +36,7 @@
 - name: Docker mosquitto | Build Docker image from Dockerfile
   docker_image:
     name: mosquitto
-    path: /tmp/mosquitto
+    path: /tmp/mosquitto/mosquitto-centos-based
     state: build
 
 - name: Docker Mosquitto | Set mosquitto.conf file

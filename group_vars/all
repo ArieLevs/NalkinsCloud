@@ -7,7 +7,7 @@ domain_name: mosquitto.nalkins.cloud
 django_admin_username: admin@nalkins.cloud
 django_admin_password: nalkinscloud
 
-# If certificates_path values is not set, /etc/ssl/certs/ will be used
+# If certificates_path values is not set, /etc/mosquitto/certs/ will be used
 # certificates_path:
 
 #######################################
@@ -42,7 +42,7 @@ mosquitto_database_password: nalkinscloud
 mosquitto_database_host: localhost
 mosquitto_database_port: 3306
 mosquitto_bks_file_password: nalkinscloud
-mosquitto_certificates_bks_path: /etc/ssl/certs/mosquitto_server.bks
+mosquitto_certificates_bks_path: /etc/mosquitto/certs/mosquitto_server.bks
 
 ############ Simulators ############
 mqtt_broker_host: ''

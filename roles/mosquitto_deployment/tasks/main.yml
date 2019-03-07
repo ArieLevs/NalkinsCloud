@@ -4,6 +4,15 @@
   user:
     name: mosquitto
 
+- name: SSL | Set certificates ownership to mosquitto
+  file:
+    path: /etc/mosquitto/certs
+    owner: mosquitto
+    group: mosquitto
+    mode: 0644
+    state: directory
+    recurse: yes
+
 - name: Mosquitto | RedHat/CentOS | Install Mosquitto dependencies
   yum:
     name: ['python36-pip', 'gcc', 'gcc-c++', 'openssl-devel', 'libuuid', 'libuuid-devel', 'mysql-devel']
@@ -113,8 +122,6 @@
 
 - include: setup_auth_plug.yml
 
-- include: generate_selfsigned_certificates.yml
-
 - include: set_mosquitto_systemd.yml
 
 - name: Mosquitto | RedHat/CentOS | Open TLS Ports
@@ -132,13 +139,13 @@
   shell: firewall-cmd --reload
   when: ansible_os_family == 'RedHat'
 
-- name: Mosquitto | Debian | Open TLS Ports
-  ufw:
-    rule: allow
-    port: "{{ item.port }}"
-    proto: tcp
-    state: "{{ item.state }}"
-  with_items:
-    - { port: '{{ default_mosquitto_tls_port }}', state: enabled }
-    - { port: '{{ default_mosquitto_port }}', state: enabled }
-  when: ansible_os_family == 'Debian'
+#- name: Mosquitto | Debian | Open TLS Ports
+#  ufw:
+#    rule: allow
+#    port: "{{ item.port }}"
+#    proto: tcp
+#    state: "{{ item.state }}"
+#  with_items:
+#    - { port: '{{ default_mosquitto_tls_port }}', state: enabled }
+#    - { port: '{{ default_mosquitto_port }}', state: enabled }
+#  when: ansible_os_family == 'Debian'

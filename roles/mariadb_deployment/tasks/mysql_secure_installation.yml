@@ -1,4 +1,15 @@
 ---
+- name: MariaDB | Debian | Adds Python MySQL support on Debian/Ubuntu
+  apt:
+    pkg: python-mysqldb
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: MariaDB | RedHat/CentOS | Adds Python MySQL support
+  yum:
+    name: MySQL-python
+    state: present
+  when: ansible_os_family == 'RedHat'
 
 - name: MariaDB | Sets the root password
   mysql_user:

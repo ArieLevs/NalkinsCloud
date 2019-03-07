@@ -1,6 +1,18 @@
 ---
 - name: Init | RedHat/CentOS | Adds Python pip
   yum:
+    name: python-setuptools
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: Init | RedHat/CentOS | Adds Python pip
+  easy_install:
+    name: pip
+    state: latest
+  when: ansible_os_family == 'RedHat'
+
+- name: Init | RedHat/CentOS | Adds Python pip
+  yum:
     name: python-pip
     state: present
   when: ansible_os_family == 'RedHat'
@@ -11,8 +23,8 @@
     state: present
   when: ansible_os_family == 'Debian'
 
-- name: Init | Debian | Install libmariadbclient-dev
+- name: Init | Debian | Install needed packages
   apt:
-    pkg: libmariadbclient-dev
+    pkg: ['libmariadbclient-dev', 'libffi-dev', 'libssl-dev']
     state: present
   when: ansible_os_family == 'Debian'

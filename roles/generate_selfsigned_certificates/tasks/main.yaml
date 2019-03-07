@@ -20,48 +20,48 @@
 
 - name: SSL | Generate an OpenSSL CA key.
   openssl_privatekey:
-    path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.key"
+    path: "{{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_ca.key"
     size: 4096
 
 - name: SSL | Generate an OpenSSL CRT for certificate.
   openssl_csr:
-    path:  "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.csr"
-    privatekey_path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.key"
+    path:  "{{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_ca.csr"
+    privatekey_path: "{{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_ca.key"
     common_name: "{{ common_name | default(default_common_name) }}"
 
 - name: SSL | Generate an OpenSSL certificate for the CA.
   openssl_certificate:
-    path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.crt"
-    privatekey_path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.key"
-    csr_path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.csr"
+    path: "{{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_ca.crt"
+    privatekey_path: "{{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_ca.key"
+    csr_path: "{{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_ca.csr"
     provider: selfsigned
 
 - name: SSL | Generate an OpenSSL server key.
   openssl_privatekey:
-    path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_server.key"
+    path: "{{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_server.key"
     size: 4096
 
 - name: SSL | Generate an OpenSSL CSR.
   openssl_csr:
-    path:  "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_server.csr"
-    privatekey_path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_server.key"
+    path:  "{{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_server.csr"
+    privatekey_path: "{{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_server.key"
     common_name: "{{ common_name | default(default_common_name) }}"
 
 - name: SSL | Generate certificate
   shell: |
     openssl x509 -req \
-    -in {{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_server.csr \
-    -CA {{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.crt \
-    -CAkey {{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_ca.key \
+    -in {{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_server.csr \
+    -CA {{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_ca.crt \
+    -CAkey {{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_ca.key \
     -CAcreateserial \
-    -out {{ certificates_path | default(default_certificates_path) }}{{ cert_name }}_server.crt \
+    -out {{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_server.crt \
     -days 360
 
 #- name: SSL | Generate a Self Signed OpenSSL certificate.
 #  openssl_certificate:
-#    path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}.{{ domain_name }}.crt"
-#    privatekey_path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}.{{ domain_name }}.key"
-#    csr_path: "{{ certificates_path | default(default_certificates_path) }}{{ cert_name }}.{{ domain_name }}.csr"
+#    path: "{{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}.{{ domain_name }}.crt"
+#    privatekey_path: "{{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}.{{ domain_name }}.key"
+#    csr_path: "{{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}.{{ domain_name }}.csr"
 #    provider: selfsigned
 
 #- name: SSL | Set certificates directiry permissions

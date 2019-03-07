@@ -6,12 +6,12 @@ log_timestamp true
 log_type all
 log_dest file /var/log/mosquitto/mosquitto.log
 
-listener 1883 localhost
+listener 1883
 listener {{ default_mosquitto_tls_port }}
 
-cafile /etc/mosquitto/certs/mosquitto_ca.crt
-keyfile /etc/mosquitto/certs/mosquitto_server.key
-certfile /etc/mosquitto/certs/mosquitto_server.crt
+cafile {{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_ca.crt
+keyfile {{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_server.key
+certfile {{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_server.crt
 
 tls_version tlsv1.1
 #use_identity_as_username true

@@ -10,11 +10,10 @@
    - django_email_host_password
    - django_email_host_port
 
-- include_role:
-    name: install_docker
+#- include_role:
+#    name: install_docker
 
 - name: Docker nalkinscloud API | Git clone nalkinscloud api
-# Example read-write git checkout from github
   git:
     repo: "{{ nalkinscloud_api_git_repo | default(default_nalkinscloud_api_git_repo) }}"
     dest: /tmp/nalkinscloud-api
