@@ -38,3 +38,7 @@
   fetch:
     src: "{{ mosquitto_certificates_bks_path | default(default_mosquitto_certificates_bks_path) }}"
     dest: /tmp
+
+- name: BKS | Set facts
+  set_fact:
+    bks_pass: "{{ mosquitto_bks_file_password | default(default_mosquitto_bks_file_password) }}"

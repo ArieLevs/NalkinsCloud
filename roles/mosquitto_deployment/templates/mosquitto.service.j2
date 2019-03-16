@@ -3,7 +3,8 @@ Description=Mosquitto MQTT Broker
 Documentation=man:mosquitto(8)
 Documentation=man:mosquitto.conf(5)
 ConditionPathExists=/etc/mosquitto/mosquitto.conf
-After=xdk-daemon.service
+Requires=mariadb.service
+After=xdk-daemon.service mariadb.service
 
 [Service]
 ExecStart=/usr/local/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf

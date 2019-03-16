@@ -50,7 +50,7 @@
     network_mode: host
     env:
       environment: "{{ api_environment | default(default_api_environment) }}"
-      allowed_hosts: "{{ hostvars[groups['nalkinscloud_django'][0]].inventory_hostname }}"
+      allowed_hosts: "{{ api_allowed_hosts | default(hostvars[groups['nalkinscloud_django'][0]].inventory_hostname) }}"
 
       django_secret_key: "{{ lookup('password', '/dev/null length=50') }}'"
       db_name: "{{ django_database_name | default(default_django_database_name) }}"

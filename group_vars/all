@@ -13,6 +13,7 @@ django_admin_password: nalkinscloud
 #######################################
 # If environment is production, simulators devices will not be added to database
 api_environment: alpha
+api_allowed_hosts: "*"
 
 # If below values are not set, email verification will not work!!!
 # If you choose not to set below values manual registration approval will be needed

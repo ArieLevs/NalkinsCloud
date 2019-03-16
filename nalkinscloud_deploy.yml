@@ -1,6 +1,3 @@
-# Usage:
-# ansible-playbook -i inventory -Kb -u [USERNAME] -e"mosquitto_host=[MOSQUITTO_HOST_GROUP] database_hosts=[DB_HOST_GROUP] django_host=[DJANGO_HOST_GROUP] domain_name=[DOMAIN_NAME] graylog_host=[GRAYLOG_HOST] certificates_path=[PATH_TO_CERTIFICATES]" nalkinscloud_deploy.yml --key-file "[SSH_KEY]"
-
 
 - name: Register OS id name
   hosts: "{{ mosquitto_host }}"
@@ -11,7 +8,7 @@
       when: ansible_os_family == 'Debian'
     - name: Print version
       debug:
-        msg: "OS is name: {{ os_id.stdout }}"
+        msg: "OS id is: {{ os_id.stdout }}"
 
 - name: System Init
   hosts:
@@ -70,3 +67,13 @@
   become: true
   roles:
     - create_bks_from_crt
+
+- name: Print facts
+  hosts: "{{ mosquitto_host }}"
+  tasks:
+    - name: Print Mosquitto Certificate common name
+      debug:
+        msg: "Mosquitto Certificate common name is: {{ cert_common_name }}"
+    - name: Print mosquitto BSK password
+      debug:
+        msg: "BKS password used is: {{ bks_pass }}"

@@ -4,14 +4,21 @@
   user:
     name: mosquitto
 
-- name: SSL | Set certificates ownership to mosquitto
+- name: Mosquitto | Set certificates ownership to mosquitto
   file:
-    path: /etc/mosquitto/certs
+    path: "{{ certificates_path | default(default_certificates_path) }}"
     owner: mosquitto
     group: mosquitto
-    mode: 0644
+    mode: 0755
     state: directory
-    recurse: yes
+    recurse: no
+
+- name: Mosquitto | Update permissions for mosquitto user
+  file:
+    path: "{{ certificates_path | default(default_certificates_path) }}/{{ cert_name }}_server.key"
+    owner: mosquitto
+    group: mosquitto
+    mode: 0744
 
 - name: Mosquitto | RedHat/CentOS | Install Mosquitto dependencies
   yum:

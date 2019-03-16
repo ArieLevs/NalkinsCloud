@@ -122,10 +122,7 @@ ansible-playbook -i inventory \
     -e"mosquitto_host=[MOSQUITTO_HOST_GROUP] \
     database_host=[DB_HOST_GROUP] \
     django_hoss=[DJANGO_HOST_GROUP] \
-    mqtt_simulators_host=[SIMULATORS_HOST_GROUP] \
-    domain_name=[DOMAIN_NAME] 
-    django_database_host[DB_HOST] \
-    mosquitto_database_host=[DB_HOST]" \
+    mqtt_simulators_host=[SIMULATORS_HOST_GROUP]" \
     NalkinsCloud/nalkinscloud_deploy.yml \
     --key-file "[SSH_KEY]"
 ```
