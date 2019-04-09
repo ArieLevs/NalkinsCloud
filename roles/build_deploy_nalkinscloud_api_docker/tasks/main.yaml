@@ -41,6 +41,7 @@
     name: nalkinscloud-api
     path: /tmp/nalkinscloud-api
     state: build
+    force: yes
 
 - name: Docker nalkinscloud API | Run nalkinscloud-api container
   docker_container:
