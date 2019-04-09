@@ -35,6 +35,7 @@
     name: mqtt_simulators
     path: /tmp/mqtt_simulators
     state: build
+    force: yes
 
 - name: Docker MQTT simulators | Run mqtt_simulators container
   docker_container:
