@@ -76,3 +76,7 @@
 - name: SSL | Set facts
   set_fact:
     cert_common_name: "{{ common_name | default(default_common_name) }}"
+
+- name: SSL | Print certificate common name
+  debug:
+    msg: "Mosquitto Certificate common name is: {{ cert_common_name }}"

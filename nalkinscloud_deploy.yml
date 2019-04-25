@@ -67,13 +67,3 @@
   become: true
   roles:
     - create_bks_from_crt
-
-- name: Print facts
-  hosts: "{{ mosquitto_host }}"
-  tasks:
-    - name: Print Mosquitto Certificate common name
-      debug:
-        msg: "Mosquitto Certificate common name is: {{ cert_common_name }}"
-    - name: Print mosquitto BSK password
-      debug:
-        msg: "BKS password used is: {{ bks_pass }}"

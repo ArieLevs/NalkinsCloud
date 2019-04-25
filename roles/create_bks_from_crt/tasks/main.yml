@@ -42,3 +42,7 @@
 - name: BKS | Set facts
   set_fact:
     bks_pass: "{{ mosquitto_bks_file_password | default(default_mosquitto_bks_file_password) }}"
+
+- name: BKS | Print BSK password
+  debug:
+    msg: "BKS password used is: {{ bks_pass }}"
