@@ -1,5 +1,6 @@
 
 default_mqtt_simulators_git_repo: https://github.com/ArieLevs/NalkinsCloud-MQTT-Automation-Simulators.git
+# TODO change below host to 127.0.0.1 once Ansible 2.8 is released https://github.com/ansible/ansible/issues/21433
 default_broker_host: "{{ hostvars[groups['nalkinscloud_mosquitto'][0]].inventory_hostname }}"
 default_broker_port: 1883
 default_dht_user: test_dht_simulator

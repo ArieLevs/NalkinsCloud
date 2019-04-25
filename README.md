@@ -134,8 +134,8 @@ Then you PERMANENTLY remove these password.
 
 Post Installation
 -----------------
-Ansible will store a .bks file at `/tmp/[MOSUITTO_HOST]/etc/ssl/certs` on your local machine (by default)  
-This file will later be needed in order for the android app to work
+Ansible will store a .bks file at `/tmp/[MOSUITTO_HOST]/etc/ssl/certs` on your local machine (by default),  
+This file will later be needed in order for the android app to work.
 
 Go to `Application` page in django admin, *Please change domain with relevant IP\Domain*.
 	https://www.nalkins.cloud/admin/oauth2_provider/application/add/ 
@@ -148,7 +148,7 @@ Choose:
 	And save
 ```
 We have just created an application so django can serve clients  
-Please note for 'Client id' and 'Client secret' which are important for our clients to receive tokens
+Please note for 'Client id' and 'Client secret' which are important for our clients to receive tokens.
 
 ### Setting up ESP8266 device
 Please walkthrough [NalkinsCloud-ESP8266](https://github.com/ArieLevs/NalkinsCloud-ESP8266)
@@ -160,10 +160,6 @@ Conclusion
 ----------
 
 OK so what we've done here,  
-We've installed MariaDB server that will serve both client and devices  
-Installed Django application which runs under apache server  
-Installed Mosquitto server that serve subscriptions and publish of messages  
-Installed Homebridge server with mqtt plugin to support IOS homekit app  
-And created a service that will inject mqtt messaged to the database  
-
-* Please note - I'm currently integrating homebridge to NalkinsCloud project, once all is done will update the project
+We've installed MariaDB server that will serve both client and devices,  
+Installed Django application,   
+Installed Mosquitto server that serve subscriptions and publish of messages.
