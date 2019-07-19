@@ -28,7 +28,7 @@
 
 - name: Mosquitto | Debian | Install Mosquitto dependencies
   apt:
-    pkg: ['gcc', 'g++', 'make', 'libssl-dev', 'uuid', 'uuid-dev', 'libmariadbclient-dev']
+    pkg: ['gcc', 'g++', 'make', 'libssl-dev', 'uuid', 'uuid-dev', 'libmariadbclient-dev', 'default-libmysqlclient-dev']
     state: latest
   when: ansible_os_family == 'Debian'
 
@@ -89,7 +89,7 @@
     executable: pip3.6
   when: ansible_os_family == 'RedHat'
 
-- name: Mosquitto | Debian| Installing PIP related dependencies
+- name: Mosquitto | Debian | Installing PIP related dependencies
   pip:
     name: ['paho-mqtt', 'mysqlclient']
     executable: pip3
