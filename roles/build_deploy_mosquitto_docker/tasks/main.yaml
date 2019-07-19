@@ -6,6 +6,9 @@
   with_items:
    - domain_name
 
+- include_role:
+    name: install_docker
+
 - name: Docker mosquitto | Call role install docker
   include_role:
     name: install_docker

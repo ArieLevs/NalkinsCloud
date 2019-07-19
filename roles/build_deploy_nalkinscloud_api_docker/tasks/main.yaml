@@ -10,8 +10,8 @@
    - django_email_host_password
    - django_email_host_port
 
-#- include_role:
-#    name: install_docker
+- include_role:
+    name: install_docker
 
 - name: Docker nalkinscloud API | Git clone nalkinscloud api
   git:
