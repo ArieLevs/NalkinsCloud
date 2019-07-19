@@ -1,6 +1,6 @@
 
 default_database_name: nalkinscloud
-default_database_root_password: ''
+default_database_root_password: nalkinscloud
 
 default_django_database_name: nalkinscloud
 default_django_database_username: django
