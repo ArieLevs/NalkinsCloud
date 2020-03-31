@@ -20,14 +20,14 @@
 
 - name: Docker nalkinscloud API | RedHat/CentOS | Install pip
   yum:
-    name: ['python-pip']
+    name: ['python3-pip']
     state: latest
   become: true
   when: ansible_os_family == 'RedHat'
 
 - name: Docker nalkinscloud API | Debian | Install pip
   apt:
-    pkg: ['python-pip']
+    pkg: ['python3-pip']
     state: latest
   when: ansible_os_family == 'Debian'
 
