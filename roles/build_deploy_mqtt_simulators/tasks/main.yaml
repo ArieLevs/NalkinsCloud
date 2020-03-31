@@ -45,6 +45,7 @@
     name: 'mqtt_simulators'
     image: 'mqtt_simulators'
     state: 'started'
+    network_mode: '{{ network_mode | default(default_network_mode) }}'
     env:
       environment: 'production'
       broker_host: "{{ broker_host | default(default_broker_host) }}"
@@ -57,7 +58,7 @@
       switch_pass: "{{ switch_pass | default(default_switch_pass) }}"
       switch_topic: "{{ switch_topic | default(default_switch_topic) }}"
       switch_qos: "{{ switch_qos | default(default_switch_qos) }}"
-      graylog_enabled: "{{ graylog_enabled | default(default_graylog_enabled) }}"
+      graylog_enabled: "{{ graylog_enabled | default(default_graylog_enabled) | string }}"
       graylog_host: "{{ graylog_host | default(default_graylog_host) }}"
       graylog_port: "{{ graylog_port | default(default_graylog_port) }}"
     restart_policy: always
