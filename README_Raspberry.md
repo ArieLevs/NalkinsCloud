@@ -1,4 +1,15 @@
+# Raspberry pi installation
 
+download [RASPBIAN STRETCH LITE](https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2019-04-09/),
+newer versions available [here](https://www.raspberrypi.org/downloads/raspbian/) 
+but are not supported (docker installation issues),
+  
+Create micro-sd with that image, 
+([Check this for MacOS](https://www.raspberrypi.org/documentation/installation/installing-images/mac.md), 
+or use [Rufus](https://rufus.ie/) for windows).  
+Based on: Linux raspberrypi 4.9.59-v7+ # armv7l GNU/Linux
+
+## Prepare os
 Connect the Raspberry Pi to a monitor and keyboard,  
 Or copy an empty file named `ssh` to the root of the raspberry SD to allow ssh connections by default:
 
@@ -17,7 +28,7 @@ Else connect Raspberry via LAN cable to one of your router ports.
 * optional: install VIM editor (Internet connection needed) `sudo apt-get install vim`  
   Allow mouse right click to past clipboard to terminal on vim editor
 ```
-sudo vim /usr/share/vim/vim80/defaults.vim
+sudo vim /usr/share/vim/vim81/defaults.vim
 #Append: (Comment each line with ")
 	"if has('mouse')
 	"  set mouse=r

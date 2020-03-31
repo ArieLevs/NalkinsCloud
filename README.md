@@ -29,26 +29,20 @@ What will you do:
 * iOS               - Use Apple homekit application to control devices.
 
 
-Installation
+Preparations
 ------------
 All services and code in this example will setup on the same machine, Centos7 or Raspberry Pi 4.9.59-v7+
 
-Start by installing Raspberry pi, 
-download [RASPBIAN STRETCH LITE](https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2019-04-09/),
-newer versions available [here](https://www.raspberrypi.org/downloads/raspbian/) but are not supported (docker installation issues),  
-And create micro-sd with that image, 
-([Check this for MacOS](https://www.raspberrypi.org/documentation/installation/installing-images/mac.md), 
-or use [Rufus](https://rufus.ie/) for windows).  
-Based on: Linux raspberrypi 4.9.59-v7+ # armv7l GNU/Linux
+#### Raspberry Pi prepare:
+installation [described here](https://github.com/ArieLevs/NalkinsCloud/blob/master/README_Raspberry.md)
 
+
+#### Linux (CentoOS) prepare:
 For setting up the project on Centos7 OS [Download iso image](https://www.centos.org/download/),
 If you need assistance to make the USB installation [use this guide](https://wiki.centos.org/HowTos/InstallFromUSBkey).  
 Based on: CentOS Linux 7 Kernel: Linux 3.10.0-693.5.2.el7.x86_64
 
 - For additional assistance please search on how to install the OS
-
-#### If you choose Raspberry Pi you will need to configure it for SSH use
-Please read [this guild](https://github.com/ArieLevs/NalkinsCloud/blob/master/README_Raspberry.md)
 
 ### Before you begin
 If you use registered domain name and not dynamic IP address, 
@@ -60,7 +54,8 @@ by installing an agent on the server (or even your router),
 the agent will constantly sync your dynamic ip address,
 so you will have access from public internet.
 
-### Project installation
+installation
+------------
 First [install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) on your machine.  
 Clone repository:
 ```bash
