@@ -8,7 +8,8 @@
 
 - name: BKS | Debian | Install Java
   apt:
-    pkg: ['openjdk-8-jre']
+    pkg: ['openjdk-11-jre']
+    install_recommends: yes
     state: latest
   when: ansible_os_family == 'Debian'
 
