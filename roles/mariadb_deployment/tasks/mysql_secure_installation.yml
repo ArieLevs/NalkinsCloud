@@ -11,6 +11,11 @@
     state: present
   when: ansible_os_family == 'RedHat'
 
+- name: MariaDB | Install PIP mysqlclient module
+  pip:
+    name: mysqlclient
+    state: latest
+
 - name: MariaDB | Sets the root password
   mysql_user:
     login_user: root
