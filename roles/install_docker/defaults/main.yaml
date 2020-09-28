@@ -1,2 +1,0 @@
-
-default_docker_distribution_release: "{{ ansible_lsb.codename | lower }}"

@@ -11,7 +11,7 @@
    - django_email_host_port
 
 - include_role:
-    name: install_docker
+    name: docker_install_role
 
 - name: Docker nalkinscloud API | Git clone nalkinscloud api
   git:

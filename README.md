@@ -58,14 +58,19 @@ installation
 ------------
 First [install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) on your machine.  
 Clone repository:
-```bash
+```shell script
 git clone https://github.com/ArieLevs/NalkinsCloud.git
+```
+
+install dependencies:
+```shell script
+ansible-galaxy install -r requirements.yaml
 ```
 
 * You can update `vim NalkinsCloud/group_vars/all`, if vars are not updated, defaults will be installed.
 * Update `inventory` file, with relevant address of the destination installation,
   So if the host was set to `192.168.0.10` as shown before, set this value.
-```bash
+```shell script
 ansible-playbook --inventory-file inventory \
     --ask-become-pass --become --user [USERNAME] \
     -e"mosquitto_host=[MOSQUITTO_HOST_GROUP] \
@@ -77,7 +82,7 @@ ansible-playbook --inventory-file inventory \
 ```
 
 * if using default init raspberry installation use:
-```bash
+```shell script
 ansible-playbook --inventory-file inventory \
     --user pi --ask-pass \
     -e mosquitto_host=nalkinscloud_mosquitto \

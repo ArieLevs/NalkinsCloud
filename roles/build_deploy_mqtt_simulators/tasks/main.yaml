@@ -7,7 +7,7 @@
 #   - domain_name
 
 - include_role:
-    name: install_docker
+    name: docker_install_role
 
 - name: Docker MQTT simulators | Git clone nalkinscloud-simulators
 # Example read-write git checkout from github
